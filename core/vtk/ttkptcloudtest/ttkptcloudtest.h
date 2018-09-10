@@ -13,11 +13,12 @@
 #include                  <vtkIntArray.h>
 #include                  <vtkObjectFactory.h>
 #include                  <vtkStructuredGrid.h>
-#include                  <vtkRectilinearGrid.h>
+#include                  <vtkImageData.h>
 #include                  <vtkPointData.h>
 #include                  <vtkSmartPointer.h>
 #include                  <vtkSphereSource.h>
 #include                  <vtkType.h>
+#include                  <vtkInformationVector.h>
 
 // ttk code includes
 #include                  <Wrapper.h>
@@ -42,7 +43,7 @@ class ttkptcloudtest
 
     int FillOutputPortInformation(int port,
       vtkInformation *info){
-      info->Set(vtkDataObject::DATA_TYPE_NAME(), "vtkRectilinearGrid");
+      info->Set(vtkDataObject::DATA_TYPE_NAME(), "vtkImageData");
       info->Set(vtkDataObject::FIELD_NUMBER_OF_COMPONENTS(), 1);
       info->Set(vtkDataObject::FIELD_ATTRIBUTE_TYPE(), VTK_DOUBLE);
       return 1;
@@ -83,7 +84,7 @@ class ttkptcloudtest
     bool                  UseAllCores;
     int                   ThreadNumber;
     // base code features
-    int doIt(vtkDataSet *input, vtkRectilinearGrid *output);
+    int doIt(vtkDataSet *input, vtkImageData *output);
     
     bool needsToAbort();
     
