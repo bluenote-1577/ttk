@@ -38,6 +38,10 @@
 
 namespace ttk{
 
+  /**
+   * Compute the persistence diagram of a function on a triangulation.
+   * TTK assumes that the input dataset is made of only one connected component.
+   */
   class PersistenceDiagram : public Debug{
 
     public:
@@ -216,6 +220,7 @@ int ttk::PersistenceDiagram::execute() const{
   contourTree.setTreeType(ftm::TreeType::Join_Split);
   contourTree.setVertexSoSoffsets(voffsets.data());
   contourTree.setThreadNumber(threadNumber_);
+  contourTree.setDebugLevel(debugLevel_);
   contourTree.setSegmentation(false);
   contourTree.build<scalarType,idType>();
 
