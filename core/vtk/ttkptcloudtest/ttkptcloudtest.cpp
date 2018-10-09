@@ -6,6 +6,10 @@ using namespace ttk;
 vtkStandardNewMacro(ttkptcloudtest)
 
 ttkptcloudtest::ttkptcloudtest(){
+    NumberGridPoints = 100;
+    Offset = 1;
+    GaussianKDE = false;
+    Bandwidth = 1;
 }
 
 ttkptcloudtest::~ttkptcloudtest(){
@@ -36,6 +40,9 @@ int ttkptcloudtest::doIt(vtkDataSet *input, vtkImageData *output){
     double minx = 10000000;
     double miny = 10000000;
     double minz = 10000000;
+    double maxx,maxy,maxz = -1;
+    double e = 2.718281828459;
+    double pi = 3.1415926535897;
 
     int numpoints = input->GetNumberOfPoints();
     std::vector<std::vector<double>> coords;
@@ -45,6 +52,18 @@ int ttkptcloudtest::doIt(vtkDataSet *input, vtkImageData *output){
         double z = input->GetPoint(i)[2];
         std::vector<double> xyz = {x,y,z};
         coords.push_back(xyz);
+
+        if(maxx < x){
+            maxx = x;
+        }
+
+        if(maxy < y){
+            maxy = y;
+        }
+
+        if(maxz < z){
+            maxz = z;
+        }
 
         if (minx > x){
             minx = x;
@@ -59,70 +78,88 @@ int ttkptcloudtest::doIt(vtkDataSet *input, vtkImageData *output){
         }
     }
 
-    double diameter= 0;
-    for(int i = 0; i < coords.size() - 1; i++){
-        for(int k = i + 1; k < coords.size(); k++){
-            double distx = pow((coords[i][0] - coords[k][0]),2);
-            double disty = pow((coords[i][1] - coords[k][1]),2);
-            double distz = pow((coords[i][2] - coords[k][2]),2);
+    double max_coord_dist;
+    double xdist = maxx-minx;
+    double ydist = maxy-miny;
+    double zdist = maxz-minz;
 
-            double dist = sqrt(distx+disty+distz);
-            if(dist > diameter){
-                diameter= dist;
-            }
-        }
+    bool xplanar = false;
+    bool yplanar = false;
+    bool zplanar = false;
+
+    if(xdist < 0.000001){
+        xplanar = true;
     }
 
-    diameter = diameter;
+    if(ydist < 0.000001){
+        yplanar = true;
+    }
 
-    std::cout << diameter << "diam" << '\n';
+    if(zdist < 0.000001){
+        zplanar = true;
+    }
 
     vtkSmartPointer<vtkImageData> grid = vtkSmartPointer<vtkImageData>::New();
 
-    int gridpoints = 100;
-    double inc = diameter*3/gridpoints;
+    int gridpoints = NumberGridPoints;
+    double orig_x = minx - Offset;
+    double orig_y = miny - Offset;
+    double orig_z = minz - Offset;
+
+    if(xplanar){
+        orig_x = 0;
+    }
+
+    if(yplanar){
+        orig_y = 0;
+    }
+
+    if(zplanar){
+        orig_z = 0;
+    }
 
 
-//    vtkSmartPointer<vtkDoubleArray> xarray= vtkSmartPointer<vtkDoubleArray>::New();
-//    vtkSmartPointer<vtkDoubleArray> yarray= vtkSmartPointer<vtkDoubleArray>::New();
-//    vtkSmartPointer<vtkDoubleArray> zarray= vtkSmartPointer<vtkDoubleArray>::New();
-//
-    double orig_x = minx - diameter;
-    double orig_y = miny - diameter;
-    double orig_z = minz - diameter;
-//
-//    for(int i = 0; i < gridpoints; i++){
-//        x += inc;
-//        xarray->InsertNextValue(x); 
-//        y += inc;
-//        yarray->InsertNextValue(y); 
-//        z += inc;
-//        zarray->InsertNextValue(z); 
-//    }
-//
-//    grid->SetXCoordinates(xarray);
-//    grid->SetYCoordinates(yarray);
-//    grid->SetZCoordinates(zarray);
+    int total_points;
+    total_points = pow(gridpoints,3);
 
-    std::cout << "THERE ARE " << grid->GetNumberOfPoints() << '\n';
-    std::cout << "THERE ARE " << grid->GetNumberOfCells() << '\n';
+    if(xplanar || yplanar || zplanar){
+        total_points = pow(gridpoints,2);
+    }
 
-    int total_points = pow(gridpoints,3);
+    std::cerr << total_points;
+
+
     vtkSmartPointer<vtkDoubleArray> dataarray= vtkSmartPointer<vtkDoubleArray>::New();
     dataarray->vtkDoubleArray::SetNumberOfComponents(1);
     dataarray->vtkDoubleArray::SetNumberOfTuples(total_points);
     dataarray->vtkDoubleArray::SetName("dist_field");
-    grid->SetOrigin(orig_x,orig_y,orig_z);
-    grid->SetSpacing(inc,inc,inc);
-    grid->SetDimensions(gridpoints,gridpoints,gridpoints);
-    grid->GetPointData()->SetNumberOfTuples(total_points);
-    std::cerr << "origin, spacing\n";
 
-    #pragma omp parallel for
+    grid->SetOrigin(orig_x,orig_y,orig_z);
+    grid->SetSpacing((xdist+2*Offset)/NumberGridPoints,(ydist+2*Offset)/NumberGridPoints,(zdist+2*Offset)/NumberGridPoints);
+    grid->SetDimensions(gridpoints,gridpoints,gridpoints);
+
+    if(xplanar){
+        grid->SetDimensions(1,gridpoints,gridpoints);
+    }
+
+    if(yplanar){
+        grid->SetDimensions(gridpoints,1,gridpoints);
+    }
+
+    if(zplanar){
+        grid->SetDimensions(gridpoints,gridpoints,1);
+    }
+
+    grid->GetPointData()->SetNumberOfTuples(total_points);
+    int num_points_in_cloud = coords.size();
+    double bandsquared = Bandwidth * Bandwidth;
+
+    #pragma omp parallel for num_threads(threadNumber_)
     for(int i = 0; i < total_points; i++){
-//        std::cerr << "point out";
+
         double* point;
         double xpoint,ypoint,zpoint;
+
         #pragma omp critical
         { 
             point = grid->GetPoint(i);
@@ -130,9 +167,9 @@ int ttkptcloudtest::doIt(vtkDataSet *input, vtkImageData *output){
             ypoint = point[1];
             zpoint = point[2];
         }
-//        std::cerr << point[0] << point[1] << point[2] << '\n';
-//        std::cerr << "point out";
+
         double neighdist = 10000000;
+        double scalarValue = 0;
 
         for(int k = 0; k < coords.size(); k++){ 
             double x,y,z;
@@ -140,29 +177,54 @@ int ttkptcloudtest::doIt(vtkDataSet *input, vtkImageData *output){
             y = coords[k][1];
             z = coords[k][2];
 
-            double dist = sqrt(pow((xpoint - x),2) + pow((ypoint - y),2) + pow((zpoint - z),2));
+            double distsquare = (pow((xpoint - x),2) + pow((ypoint - y),2) + pow((zpoint - z),2));
 
-            if(neighdist > dist){
-                neighdist = dist;
+            if(GaussianKDE){
+                if((distsquare)/(2 * bandsquared) < 10){
+                    scalarValue += 1/(2.50662827 * Bandwidth) * pow(e,-distsquare/(2 * bandsquared));
+                }
+            }
+
+            if(neighdist > distsquare){
+                neighdist = distsquare;
             }
         }
-//        std::cerr << "calc done \n";
 
-//        std::cerr << "scalar pointer\n";
         #pragma omp critical
         {
             double* tup = new double[1];
-            tup[0] = neighdist;
+            if(GaussianKDE){
+//                scalarValue /= num_points_in_cloud;
+                tup[0] = scalarValue;
+            }
+            else{
+                tup[0] = sqrt(neighdist);
+            }
             dataarray->SetTuple(i,tup);
         }
-        std::cerr << i << '\n';
-//        std::cerr << "neighdist\n";
     }
 
     grid->GetPointData()->AddArray(dataarray);
     output->ShallowCopy(grid);
 
 }
+
+int ttkptcloudtest::RequestInformation(
+    vtkInformation *request,
+    vtkInformationVector **inputVector,
+    vtkInformationVector *outputVector)
+{
+  
+
+  vtkInformation *outInfo = outputVector->GetInformationObject(0);
+  //outInfo->Set(vtkDataObject::SPACING(), DataSpacing, 3);
+  //outInfo->Set(vtkDataObject::ORIGIN(), DataOrigin, 3);
+  //
+  outInfo->Set(vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT(),0,NumberGridPoints-1,0,NumberGridPoints-1,0,NumberGridPoints-1);
+
+  return 1;
+}
+
 
 // to adapt if your wrapper does not inherit from vtkDataSetAlgorithm
 int ttkptcloudtest::RequestData(vtkInformation *request, 
@@ -174,6 +236,7 @@ int ttkptcloudtest::RequestData(vtkInformation *request,
   vtkDataSet *input = vtkDataSet::GetData(inputVector[0]);
 
   vtkInformation *outInfo = outputVector->GetInformationObject(0);
+  outInfo->Set(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_PIECES(), 1);
   vtkImageData *output = vtkImageData::SafeDownCast(outInfo->Get(vtkDataObject::DATA_OBJECT()));
   //vtkImageData *output = vtkImageData::GetData(outputVector);
   

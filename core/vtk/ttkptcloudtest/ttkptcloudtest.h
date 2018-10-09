@@ -19,9 +19,12 @@
 #include                  <vtkSphereSource.h>
 #include                  <vtkType.h>
 #include                  <vtkInformationVector.h>
+#include                  <vtkStreamingDemandDrivenPipeline.h>
 
 // ttk code includes
 #include                  <Wrapper.h>
+#include                  <PointDistField.h>
+#include                  <Triangulation.h>
 #include                  <cmath>
 
 #ifndef TTK_PLUGIN
@@ -40,12 +43,14 @@ class ttkptcloudtest
 
     // default ttk setters
     vtkSetMacro(debugLevel_, int);
+    vtkSetMacro(NumberGridPoints, int);
+    vtkSetMacro(Offset, double);
+    vtkSetMacro(Bandwidth, double);
+    vtkSetMacro(GaussianKDE, bool);
 
     int FillOutputPortInformation(int port,
       vtkInformation *info){
       info->Set(vtkDataObject::DATA_TYPE_NAME(), "vtkImageData");
-      info->Set(vtkDataObject::FIELD_NUMBER_OF_COMPONENTS(), 1);
-      info->Set(vtkDataObject::FIELD_ATTRIBUTE_TYPE(), VTK_DOUBLE);
       return 1;
     }
 
@@ -75,14 +80,25 @@ class ttkptcloudtest
     
     ~ttkptcloudtest();
     
+int RequestInformation(
+    vtkInformation *request,
+    vtkInformationVector **inputVector,
+    vtkInformationVector *outputVector) override;
+
+  
     int RequestData(vtkInformation *request, 
-      vtkInformationVector **inputVector, vtkInformationVector *outputVector);
+      vtkInformationVector **inputVector, vtkInformationVector *outputVector) override;
     
     
   private:
     
     bool                  UseAllCores;
+    bool                  GaussianKDE;
     int                   ThreadNumber;
+    int                   NumberGridPoints;
+    double                Offset;
+    double                Bandwidth;
+
     // base code features
     int doIt(vtkDataSet *input, vtkImageData *output);
     

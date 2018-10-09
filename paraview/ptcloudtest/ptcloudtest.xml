@@ -64,6 +64,56 @@
            Debug level.
          </Documentation>
       </IntVectorProperty>
+
+     <IntVectorProperty
+         name="NumbGridPoints"
+         label="Number of Grid Points"
+         command="SetNumberGridPoints"
+         number_of_elements="1"
+         default_values="100" >
+        <IntRangeDomain name="range" min="5" max="130" />
+         <Documentation>
+           Debug level.
+         </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty
+         name="OffsetValue"
+         label="Boundary Offset"
+         command="SetOffset"
+         number_of_elements="1"
+         default_values="10" >
+        <IntRangeDomain name="range" min="0" max="30" />
+         <Documentation>
+           Debug level.
+         </Documentation>
+      </IntVectorProperty>
+
+       <IntVectorProperty
+         name="GaussianKDE"
+         label="Gaussian Kernel Density Estimation"
+         command="SetGaussianKDE"
+         number_of_elements="1"
+         default_values="0">
+        <BooleanDomain name="bool"/>
+         <Documentation>
+           Use a Gaussian kernel density estimation for 
+           scalar field value.
+         </Documentation>
+      </IntVectorProperty>
+
+        <DoubleVectorProperty
+         name="BandwidthValue"
+         label="KDE Bandwidth"
+         command="SetBandwidth"
+         number_of_elements="1"
+         default_values="1" >
+        <DoubleRangeDomain name="range" min="0" max="5" />
+         <Documentation>
+           Debug level.
+         </Documentation>
+      </DoubleVectorProperty>
+
       
       <PropertyGroup panel_widget="Line" label="Testing">
         <Property name="UseAllCores" />
