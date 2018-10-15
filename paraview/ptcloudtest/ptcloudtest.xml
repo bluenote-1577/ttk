@@ -77,17 +77,17 @@
          </Documentation>
       </IntVectorProperty>
 
-      <IntVectorProperty
+      <DoubleVectorProperty
          name="OffsetValue"
          label="Boundary Offset"
          command="SetOffset"
          number_of_elements="1"
-         default_values="10" >
-        <IntRangeDomain name="range" min="0" max="30" />
+         default_values="0.10" >
+        <DoubleRangeDomain name="range" min="0" max="1" />
          <Documentation>
            Debug level.
          </Documentation>
-      </IntVectorProperty>
+      </DoubleVectorProperty>
 
        <IntVectorProperty
          name="GaussianKDE"
@@ -107,8 +107,8 @@
          label="KDE Bandwidth"
          command="SetBandwidth"
          number_of_elements="1"
-         default_values="1" >
-        <DoubleRangeDomain name="range" min="0" max="5" />
+         default_values="0.01" >
+        <DoubleRangeDomain name="range" min="0" max="1" />
          <Documentation>
            Debug level.
          </Documentation>

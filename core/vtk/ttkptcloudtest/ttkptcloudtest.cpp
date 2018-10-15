@@ -7,9 +7,9 @@ vtkStandardNewMacro(ttkptcloudtest)
 
 ttkptcloudtest::ttkptcloudtest(){
     NumberGridPoints = 100;
-    Offset = 1;
+    Offset = 0.1;
     GaussianKDE = false;
-    Bandwidth = 1;
+    Bandwidth = 0.01;
 }
 
 ttkptcloudtest::~ttkptcloudtest(){
@@ -81,6 +81,7 @@ int ttkptcloudtest::doIt(vtkDataSet *input, vtkImageData *output){
     double max_coord_dist;
     double xdist = maxx-minx;
     double ydist = maxy-miny;
+    std::cerr << maxy << miny << '\n';
     double zdist = maxz-minz;
 
     bool xplanar = false;
@@ -102,9 +103,10 @@ int ttkptcloudtest::doIt(vtkDataSet *input, vtkImageData *output){
     vtkSmartPointer<vtkImageData> grid = vtkSmartPointer<vtkImageData>::New();
 
     int gridpoints = NumberGridPoints;
-    double orig_x = minx - Offset;
-    double orig_y = miny - Offset;
-    double orig_z = minz - Offset;
+    double orig_x = minx - Offset*xdist;
+    double orig_y = miny - Offset*ydist;
+    double orig_z = minz - Offset*zdist;
+    double scaled_Bandwidth = Bandwidth * sqrt(xdist*xdist + ydist*ydist + zdist*zdist);
 
     if(xplanar){
         orig_x = 0;
@@ -135,7 +137,7 @@ int ttkptcloudtest::doIt(vtkDataSet *input, vtkImageData *output){
     dataarray->vtkDoubleArray::SetName("dist_field");
 
     grid->SetOrigin(orig_x,orig_y,orig_z);
-    grid->SetSpacing((xdist+2*Offset)/NumberGridPoints,(ydist+2*Offset)/NumberGridPoints,(zdist+2*Offset)/NumberGridPoints);
+    grid->SetSpacing((xdist*(1 + 2*Offset))/NumberGridPoints,(ydist*(1 + 2*Offset))/NumberGridPoints,(zdist*(1 + 2*Offset))/NumberGridPoints);
     grid->SetDimensions(gridpoints,gridpoints,gridpoints);
 
     if(xplanar){
@@ -152,7 +154,7 @@ int ttkptcloudtest::doIt(vtkDataSet *input, vtkImageData *output){
 
     grid->GetPointData()->SetNumberOfTuples(total_points);
     int num_points_in_cloud = coords.size();
-    double bandsquared = Bandwidth * Bandwidth;
+    double bandsquared = scaled_Bandwidth * scaled_Bandwidth;
 
     #pragma omp parallel for num_threads(threadNumber_)
     for(int i = 0; i < total_points; i++){
@@ -181,7 +183,7 @@ int ttkptcloudtest::doIt(vtkDataSet *input, vtkImageData *output){
 
             if(GaussianKDE){
                 if((distsquare)/(2 * bandsquared) < 10){
-                    scalarValue += 1/(2.50662827 * Bandwidth) * pow(e,-distsquare/(2 * bandsquared));
+                    scalarValue += 1/(2.50662827 * scaled_Bandwidth) * pow(e,-distsquare/(2 * bandsquared));
                 }
             }
 
