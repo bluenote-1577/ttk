@@ -1,6 +1,16 @@
 ## TTK - ChangeLog
 =
 ### ttk.git
+- Depth image based geometry approximation (IEEE LDAV 2018 paper)
+- Advanced cinema+sqlite3 support
+- Lifted Wasserstein Matcher for Topology Time-Tracking (IEEE LDAV 2018 paper)
+- Dimension reduction for high dimensional data (scikit-learn integration)
+- Automatic guesses for ttk generated fields
+- Improved type consistency
+- Improved ParaView GUIs
+- DataSet Interpolator (interpolate anything onto anything)
+- Improved triangulation request
+- Bug fixes
 
 ### 0.9.6
 - Fixed major performance bug with discrete gradient (thanks to Attila Gyulassy)
