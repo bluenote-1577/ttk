@@ -13,6 +13,8 @@
 #include                  <vtkIntArray.h>
 #include                  <vtkObjectFactory.h>
 #include                  <vtkStructuredGrid.h>
+#include                  <vtkAppendFilter.h>
+#include                  <vtkTriangleFilter.h>
 #include                  <vtkImageData.h>
 #include                  <vtkPointData.h>
 #include                  <vtkSmartPointer.h>
@@ -21,11 +23,13 @@
 #include                  <vtkInformationVector.h>
 #include                  <vtkStreamingDemandDrivenPipeline.h>
 
+
 // ttk code includes
-#include                  <Wrapper.h>
+#include                  <ttkWrapper.h>
 #include                  <PointDistField.h>
 #include                  <Triangulation.h>
 #include                  <cmath>
+#include                  <vector>
 
 #ifndef TTK_PLUGIN
 class VTKFILTERSCORE_EXPORT ttkptcloudtest
@@ -47,10 +51,11 @@ class ttkptcloudtest
     vtkSetMacro(Offset, double);
     vtkSetMacro(Bandwidth, double);
     vtkSetMacro(GaussianKDE, bool);
+    vtkSetMacro(Autobandwidth, bool);
 
     int FillOutputPortInformation(int port,
       vtkInformation *info){
-      info->Set(vtkDataObject::DATA_TYPE_NAME(), "vtkImageData");
+      info->Set(vtkDataObject::DATA_TYPE_NAME(), "vtkUnstructuredGrid");
       return 1;
     }
 
@@ -73,6 +78,11 @@ class ttkptcloudtest
       SetThreads();
     }
     // end of default ttk setters
+  
+    int RequestData(vtkInformation *request,
+            vtkInformationVector **inputVector, vtkInformationVector *outputVector) override;
+
+
     
   protected:
     
@@ -80,27 +90,22 @@ class ttkptcloudtest
     
     ~ttkptcloudtest();
     
-int RequestInformation(
-    vtkInformation *request,
-    vtkInformationVector **inputVector,
-    vtkInformationVector *outputVector) override;
-
-  
-    int RequestData(vtkInformation *request, 
-      vtkInformationVector **inputVector, vtkInformationVector *outputVector) override;
-    
+        
     
   private:
     
     bool                  UseAllCores;
     bool                  GaussianKDE;
+    bool                  Autobandwidth;
     int                   ThreadNumber;
     int                   NumberGridPoints;
     double                Offset;
     double                Bandwidth;
+    ttkTriangulation      triangulation;
 
     // base code features
-    int doIt(vtkDataSet *input, vtkImageData *output);
+    int doIt(vtkDataSet *input, vtkUnstructuredGrid *output);
+    std::vector<double> closestNeighbours(vtkDataSet* input);
     
     bool needsToAbort();
     
