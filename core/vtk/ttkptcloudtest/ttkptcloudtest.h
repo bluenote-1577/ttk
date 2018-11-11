@@ -101,6 +101,7 @@ class ttkptcloudtest
     int                   NumberGridPoints;
     double                Offset;
     double                Bandwidth;
+    double                Mean;
     ttkTriangulation      triangulation;
 
     // base code features
