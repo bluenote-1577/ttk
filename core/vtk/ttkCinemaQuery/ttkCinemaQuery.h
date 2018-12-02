@@ -9,18 +9,20 @@
 ///
 /// VTK wrapping code for the @CinemaQuery package.
 ///
-/// param Input Input table (vtkTable)
-/// param Output Output table (vtkTable)
+/// \param Input Input table (vtkTable)
+/// \param Output Output table (vtkTable)
 ///
 /// sa ttk::CinemaQuery
+
 #pragma once
 
-#include                <vtkTableAlgorithm.h>
-#include                <vtkInformation.h>
-#include                <vtkTable.h>
+// VTK includes
+#include <vtkTableAlgorithm.h>
+#include <vtkInformation.h>
 
-#include                  <CinemaQuery.h>
-#include                  <ttkWrapper.h>
+// TTK includes
+#include <CinemaQuery.h>
+#include <ttkWrapper.h>
 
 #ifndef TTK_PLUGIN
 class VTKFILTERSCORE_EXPORT ttkCinemaQuery
@@ -78,12 +80,12 @@ class ttkCinemaQuery
         bool UseAllCores;
         int ThreadNumber;
 
+        std::string      QueryString;
+        ttk::CinemaQuery cinemaQuery;
+
         int RequestData(vtkInformation *request, vtkInformationVector **inputVector, vtkInformationVector *outputVector) override;
 
     private:
-
-        std::string      QueryString;
-        ttk::CinemaQuery cinemaQuery;
 
         bool needsToAbort() override { return GetAbortExecute();};
         int updateProgress(const float &progress) override {

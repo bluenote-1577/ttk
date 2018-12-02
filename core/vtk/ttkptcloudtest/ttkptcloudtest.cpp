@@ -86,23 +86,23 @@ std::vector<double> ttkptcloudtest::closestNeighbours(vtkDataSet *input){
         }
     }
 
-    double mean = 0;
+    Mean = 0;
     for(int i = 0; i < neighbourdistance.size(); i++){
-        mean += neighbourdistance[i];
+        Mean += neighbourdistance[i];
     }
-    mean = mean / neighbourdistance.size();
-    std::cerr << "mean distance " << mean << '\n';
+    Mean = Mean / neighbourdistance.size();
+    std::cerr << "Mean distance " << Mean << '\n';
 
     for(int i = 0; i < neighbourdistance.size(); i++){
-        if(neighbourdistance[i] <  mean/3){
+        if(neighbourdistance[i] <  Mean/3){
 
-            std::cerr << neighbourdistance[i] << " 3/ mean \n";
-            neighbourdistance[i] = mean/3;
+            std::cerr << neighbourdistance[i] << " 3/ Mean \n";
+            neighbourdistance[i] = Mean/3;
         }
 
-        else if (neighbourdistance[i] >  mean*3){
-            std::cerr << neighbourdistance[i] << " 3x mean \n";
-            neighbourdistance[i] = mean*3;
+        else if (neighbourdistance[i] >  Mean*3){
+            std::cerr << neighbourdistance[i] << " 3x Mean \n";
+            neighbourdistance[i] = Mean*3;
 
         }
     }
@@ -160,6 +160,25 @@ int ttkptcloudtest::doIt(vtkDataSet *input, vtkUnstructuredGrid *output){
     double ydist = maxy-miny;
 //    std::cerr << maxy << miny << '\n';
     double zdist = maxz-minz;
+
+    double maxdist;
+
+    if(ydist > zdist){
+        if (ydist > xdist){
+            maxdist = ydist;
+        }
+        else{
+            maxdist = xdist;
+        }
+    }
+    else{
+        if(zdist > xdist){
+            maxdist = zdist;
+        }
+        else{
+            maxdist = xdist;
+        }
+    }
 
     bool xplanar = false;
     bool yplanar = false;
@@ -268,13 +287,15 @@ int ttkptcloudtest::doIt(vtkDataSet *input, vtkUnstructuredGrid *output){
             double distsquare = (pow((xpoint - x),2) + pow((ypoint - y),2) + pow((zpoint - z),2));
 
             if(GaussianKDE){
-                if((distsquare)/(2 * scaled_Bandwidth * scaled_Bandwidth) < 10){
                     double bandwidth = scaled_Bandwidth;
                     if(Autobandwidth){
-                        bandwidth = neighbourdistance[k];
+                        double exponent = .80;
+                        bandwidth = pow(neighbourdistance[k],exponent) * pow(maxdist,1-exponent);
                     }
+
+                if((distsquare)/(2 * bandwidth* bandwidth) < 15){
                     bandsquared = bandwidth * bandwidth;
-                    scalarValue += 1/(2.50662827 * bandwidth) * pow(e,-distsquare/(2 * bandsquared));
+                    scalarValue += 1/(2.50662827 * Mean) * pow(e,-distsquare/(2 * bandsquared));
                 }
             }
 

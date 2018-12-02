@@ -12,14 +12,15 @@
 /// \param Input vtkDataObject that will be depicted (vtkDataObject)
 /// \param Input vtkPointSet that records the camera sampling locations (vtkPointSet)
 /// \param Output vtkMultiBlockDataSet that represents a list of images (vtkMultiBlockDataSet)
-///
-/// \sa ttk::CinemaImaging
+
 #pragma once
 
-#include                  <vtkInformation.h>
-#include                  <vtkMultiBlockDataSetAlgorithm.h>
+// VTK includes
+#include <vtkInformation.h>
+#include <vtkMultiBlockDataSetAlgorithm.h>
 
-#include                  <ttkWrapper.h>
+// TTK includes
+#include <ttkWrapper.h>
 
 #ifndef TTK_PLUGIN
 class VTKFILTERSCORE_EXPORT ttkCinemaImaging
@@ -99,14 +100,14 @@ class ttkCinemaImaging
         bool UseAllCores;
         int ThreadNumber;
 
-        int RequestData(vtkInformation *request, vtkInformationVector **inputVector, vtkInformationVector *outputVector) override;
-
-    private:
-
         int Resolution[2];
         double CamNearFar[2];
         double CamFocus[3];
         double CamHeight;
+
+        int RequestData(vtkInformation *request, vtkInformationVector **inputVector, vtkInformationVector *outputVector) override;
+
+    private:
 
         bool needsToAbort() override { return GetAbortExecute();};
         int updateProgress(const float &progress) override {

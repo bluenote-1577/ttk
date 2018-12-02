@@ -8,12 +8,14 @@
 /// This filter stores the input as a VTK dataset to disk and updates the data.csv file of a Cinema Spec D database.
 ///
 /// \param Input vtkDataSet to be stored (vtkDataSet)
+
 #pragma once
 
-#include <vtkMultiBlockDataSet.h>
+// VTK includes
 #include <vtkXMLPMultiBlockDataWriter.h>
 #include <vtkInformation.h>
 
+// TTK includes
 #include <ttkWrapper.h>
 
 #ifndef TTK_PLUGIN
@@ -58,7 +60,7 @@ class ttkCinemaWriter
 
         int FillOutputPortInformation(int port, vtkInformation *info) override {
             switch(port)
-                case 0: info->Set(vtkDataObject::DATA_TYPE_NAME(), "vtkMultiBlockDataSet");
+                case 0: info->Set(vtkDataObject::DATA_TYPE_NAME(), "vtkPolyData");
             return 1;
         }
 
@@ -78,12 +80,12 @@ class ttkCinemaWriter
         bool UseAllCores;
         int ThreadNumber;
 
+        std::string DatabasePath;
+        bool OverrideDatabase;
+
         int RequestData(vtkInformation *request, vtkInformationVector **inputVector, vtkInformationVector *outputVector);
 
     private:
-
-        std::string DatabasePath;
-        bool OverrideDatabase;
 
         bool needsToAbort() override { return GetAbortExecute();};
         int updateProgress(const float &progress) override {
