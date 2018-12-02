@@ -13,15 +13,11 @@
 #include                  <vtkIntArray.h>
 #include                  <vtkObjectFactory.h>
 #include                  <vtkStructuredGrid.h>
-#include                  <vtkAppendFilter.h>
-#include                  <vtkTriangleFilter.h>
 #include                  <vtkImageData.h>
 #include                  <vtkPointData.h>
 #include                  <vtkSmartPointer.h>
-#include                  <vtkSphereSource.h>
 #include                  <vtkType.h>
 #include                  <vtkInformationVector.h>
-#include                  <vtkStreamingDemandDrivenPipeline.h>
 
 
 // ttk code includes
@@ -106,7 +102,7 @@ class ttkptcloudtest
 
     // base code features
     int doIt(vtkDataSet *input, vtkUnstructuredGrid *output);
-    std::vector<double> closestNeighbours(vtkDataSet* input);
+    std::vector<double> closestNeighbours(vtkDataSet* input, bool isPlanar);
     
     bool needsToAbort();
     
