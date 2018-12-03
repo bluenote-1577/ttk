@@ -1,0 +1,5 @@
+ttk_add_base_library(persistenceSimplification
+	SOURCES PersistenceSimplification.cpp
+	HEADERS PersistenceSimplification.h
+	LINK triangulation persistenceDiagram topologicalSimplification)
+

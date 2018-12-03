@@ -1,0 +1,4 @@
+ttk_add_vtk_library(ttkPersistenceSimplification
+	SOURCES ttkPersistenceSimplification.cpp
+	HEADERS ttkPersistenceSimplification.h
+	LINK persistenceSimplification ttkTriangulation)
