@@ -99,9 +99,12 @@ class ttkptcloudtest
     double                Bandwidth;
     double                Mean;
     ttkTriangulation      triangulation;
+    ttk::PointDistField   pointDistField;
 
     // base code features
     int doIt(vtkDataSet *input, vtkUnstructuredGrid *output);
+    int doIt_test(vtkDataSet *input, vtkUnstructuredGrid *output);
+
     std::vector<double> closestNeighbours(vtkDataSet* input, bool isPlanar);
     
     bool needsToAbort();
