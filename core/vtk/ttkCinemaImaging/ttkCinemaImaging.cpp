@@ -1,5 +1,7 @@
 #include <ttkCinemaImaging.h>
 
+#include <vtkVersion.h>
+
 #include <vtkSmartPointer.h>
 #include <vtkPointSet.h>
 #include <vtkMultiBlockDataSet.h>
@@ -43,7 +45,7 @@ int ttkCinemaImaging::RequestData(
         stringstream msg;
         msg<<"================================================================================"<<endl;
         msg<<"[ttkCinemaImaging] RequestData"<<endl;
-        dMsg(cout, msg.str(), timeMsg);
+        dMsg(cout, msg.str(), infoMsg);
     }
 
     Memory m;
@@ -51,14 +53,14 @@ int ttkCinemaImaging::RequestData(
     double t0=0;
 
     // Get Input / Output
-    vtkInformation* inputGeomertyInfo = inputVector[0]->GetInformationObject(0);
-    auto inputObject = inputGeomertyInfo->Get(vtkDataObject::DATA_OBJECT());
+    vtkInformation* inputObjectInfo = inputVector[0]->GetInformationObject(0);
+    auto inputObject = inputObjectInfo->Get(vtkDataObject::DATA_OBJECT());
 
     vtkInformation* inGridInfo = inputVector[1]->GetInformationObject(0);
     auto inputGrid = vtkPointSet::SafeDownCast( inGridInfo->Get(vtkDataObject::DATA_OBJECT()) );
 
     vtkInformation* outInfo = outputVector->GetInformationObject(0);
-    auto output = vtkMultiBlockDataSet::SafeDownCast(outInfo->Get(vtkDataObject::DATA_OBJECT()));
+    auto outputImages = vtkMultiBlockDataSet::SafeDownCast(outInfo->Get(vtkDataObject::DATA_OBJECT()));
 
     // -------------------------------------------------------------------------
     // Initialize Shared Render Objects
@@ -137,7 +139,7 @@ int ttkCinemaImaging::RequestData(
     {
         auto valuePassCollection = vtkSmartPointer<vtkRenderPassCollection>::New();
 
-        // Lambda function that generates a vtkValuePasses for Point or Cell Data
+        // Lambda function that generates vtkValuePasses for Point or Cell Data
         auto addValuePasses = [](
             vtkRenderPassCollection* valuePassCollection,
             vector< pair<vtkValuePass*,string> >& valuePassList,
@@ -201,8 +203,8 @@ int ttkCinemaImaging::RequestData(
     {
         stringstream msg;
         msg<<"[ttkCinemaImaging] ERROR: VTK version too old." << endl;
-        msg<<"[ttkCinemaImaging]        Support for Value Images requires VTK 7.0 or higher" << endl;
-        dMsg(cout, msg.str(), timeMsg);
+        msg<<"[ttkCinemaImaging]        Value images requires VTK 7.0 or higher" << endl;
+        dMsg(cout, msg.str(), fatalMsg);
     }
     #endif
 
@@ -321,7 +323,6 @@ int ttkCinemaImaging::RequestData(
         // Add Point Data
         #if VTK_MAJOR_VERSION >= 7
         if(renderValuePasses){
-
             // Render Value Passes
             renderWindow1->Render();
 
@@ -336,7 +337,9 @@ int ttkCinemaImaging::RequestData(
         #endif
 
         // Add Image to MultiBlock
-        output->SetBlock(i, outputImage);
+        outputImages->SetBlock(i, outputImage);
+
+        this->updateProgress( ((float)i)/((float)(n-1)) );
     }
 
     // Output Performance
@@ -346,7 +349,7 @@ int ttkCinemaImaging::RequestData(
         msg << "[ttkCinemaImaging] " << n << " Images rendered" << endl;
         msg << "[ttkCinemaImaging]   time: " << (t.getElapsedTime()-t0) << " s" << endl;
         msg << "[ttkCinemaImaging] memory: " << m.getElapsedUsage() << " MB" << endl;
-        dMsg(cout, msg.str(), memoryMsg);
+        dMsg(cout, msg.str(), timeMsg);
     }
 
     return 1;
