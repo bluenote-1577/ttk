@@ -18,6 +18,7 @@
 #include                  <Wrapper.h>
 #include                  <PersistenceDiagram.h>
 #include                  <TopologicalSimplification.h>
+#include                  <FTMTreePP.h>
 
 
 namespace ttk{
@@ -39,7 +40,7 @@ namespace ttk{
       /// setupTriangulation() from any time performance measurement.
       /// \param argment Dummy integer argument.
       /// \return Returns 0 upon success, negative values otherwise.
-      template <class dataType>
+      template <typename scalarType, typename idType>
         int execute(const int &argument) const;
     
       /// Pass a pointer to an input array representing a scalarfield.
@@ -135,7 +136,7 @@ namespace ttk{
 // #include                  <PersistenceSimplification.cpp>
 
 // template functions
-template <class dataType> int ttk::PersistenceSimplification::execute(
+template <typename scalarType, typename idType> int ttk::PersistenceSimplification::execute(
   const int &argument) const{
 
   Timer t;
@@ -150,8 +151,8 @@ template <class dataType> int ttk::PersistenceSimplification::execute(
     return -3;
 #endif
 
-  dataType *outputData = (dataType *) outputData_;
-  dataType *inputData = (dataType *) inputData_;
+  scalarType *outputData = (scalarType *) outputData_;
+  scalarType *inputData = (scalarType *) inputData_;
   
   SimplexId vertexNumber = triangulation_->getNumberOfVertices();
 
@@ -171,17 +172,33 @@ template <class dataType> int ttk::PersistenceSimplification::execute(
     // end of TODO-2
   }
 
-  PersistenceDiagram persistenceDiagram;
-  persistenceDiagram.setInputScalars(inputData);
-  persistenceDiagram.setupTriangulation(triangulation_);
-  persistenceDiagram.setOutputCTDiagram(CTDiagram);
-  // persistenceDiagram.execute();  // What do I have to put in the <...> for this call?? I get an error if left empty. 
+  const SimplexId numberOfVertices=triangulation_->getNumberOfVertices();
+  // convert offsets into a valid format for contour tree
+  std::vector<SimplexId> voffsets(numberOfVertices);
+  // std::copy(offsets,offsets+numberOfVertices,voffsets.begin()); // Was used in persistence curve
 
-  TopologicalSimplification topologicalSimplification;
-  topologicalSimplification.setupTriangulation(triangulation_);
-  topologicalSimplification.setInputScalarFieldPointer(inputData);
-  // topologicalSimplification.setVertexIdentifierScalarFieldPointer(identifiers);
-  topologicalSimplification.setOutputScalarFieldPointer(outputData);
+  // get contour tree
+  ftm::FTMTreePP contourTree;
+  contourTree.setupTriangulation(triangulation_, false);
+  contourTree.setVertexScalars(inputData);
+  contourTree.setTreeType(ftm::TreeType::Join_Split);
+  contourTree.setVertexSoSoffsets(voffsets.data());
+  contourTree.setSegmentation(false);
+  contourTree.setThreadNumber(threadNumber_);
+  contourTree.build<scalarType,idType>();
+
+  // get persistence pairs
+  std::vector<std::tuple<SimplexId, SimplexId, scalarType>> JTPairs;
+  std::vector<std::tuple<SimplexId, SimplexId, scalarType>> STPairs;
+  contourTree.computePersistencePairs<scalarType>(JTPairs, true);
+  contourTree.computePersistencePairs<scalarType>(STPairs, false);
+
+  // TopologicalSimplification topologicalSimplification;
+  // topologicalSimplification.setupTriangulation(triangulation_);
+  // topologicalSimplification.setInputScalarFieldPointer(inputData);
+  // topologicalSimplification.setVertexIdentifierScalarFieldPointer(JTPairs);
+  // topologicalSimplification.setOutputScalarFieldPointer(outputData);
+  // topologicalSimplification.execute<scalarType,idType>();
 
   std::cout << "It Worked!\n";
 

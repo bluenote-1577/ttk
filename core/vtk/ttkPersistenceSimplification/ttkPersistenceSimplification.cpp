@@ -88,7 +88,7 @@ int ttkPersistenceSimplification::doIt(vector<vtkDataSet *> &inputs, vector<vtkD
   persistenceSimplification_.setInputDataPointer(inputScalarField->GetVoidPointer(0));
   persistenceSimplification_.setOutputDataPointer(outputScalarField_->GetVoidPointer(0));
   switch(inputScalarField->GetDataType()){
-    ttkTemplateMacro(persistenceSimplification_.execute<VTK_TT>(SomeIntegerArgument));
+    ttkTemplateMacro(persistenceSimplification_.execute<VTK_TT TTK_COMMA int>(SomeIntegerArgument));
   }
   
   {
