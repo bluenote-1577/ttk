@@ -57,6 +57,16 @@ namespace ttk{
         return 0;
       }
 
+      inline int setInputOffsetDataPointer(void *data){
+        offsetData_ = data;
+        return 0;
+      }
+
+      inline int setOutputOffsetDataPointer(void *data){
+        outputOffsetData_ = data;
+        return 0;
+      }
+
       /// Pass a pointer to an output array representing a scalar field.
       /// The expected format for the array is the following:
       /// <vertex0-component0> <vertex0-component1> ... <vertex0-componentN>
@@ -125,10 +135,8 @@ namespace ttk{
     
     protected:
     
-      void                  *inputData_, *outputData_;
+      void                  *inputData_, *outputData_, *offsetData_, *outputOffsetData_;
       Triangulation         *triangulation_;
-      void* CTDiagram;
-      void* identifiers;
   };
 }
 
@@ -153,6 +161,8 @@ template <typename scalarType, typename idType> int ttk::PersistenceSimplificati
 
   scalarType *outputData = (scalarType *) outputData_;
   scalarType *inputData = (scalarType *) inputData_;
+  // SimplexId *offsetData = (SimplexId *) offsetData_;
+  // SimplexId *outputOffsetData = (SimplexId *) outputOffsetData_;
   
   SimplexId vertexNumber = triangulation_->getNumberOfVertices();
 
@@ -190,15 +200,110 @@ template <typename scalarType, typename idType> int ttk::PersistenceSimplificati
   // get persistence pairs
   std::vector<std::tuple<SimplexId, SimplexId, scalarType>> JTPairs;
   std::vector<std::tuple<SimplexId, SimplexId, scalarType>> STPairs;
+  std::vector<SimplexId> vertexIdentifiers;
   contourTree.computePersistencePairs<scalarType>(JTPairs, true);
   contourTree.computePersistencePairs<scalarType>(STPairs, false);
 
-  // TopologicalSimplification topologicalSimplification;
-  // topologicalSimplification.setupTriangulation(triangulation_);
-  // topologicalSimplification.setInputScalarFieldPointer(inputData);
-  // topologicalSimplification.setVertexIdentifierScalarFieldPointer(JTPairs);
-  // topologicalSimplification.setOutputScalarFieldPointer(outputData);
-  // topologicalSimplification.execute<scalarType,idType>();
+  // merge pairs
+  std::vector<std::tuple<SimplexId, SimplexId, scalarType, bool>> CTPairs(JTPairs.size() +
+                                                                        STPairs.size());
+  const SimplexId JTSize = JTPairs.size();
+  for (SimplexId i = 0; i < JTSize; ++i) {
+     const auto& x = JTPairs[i];
+     CTPairs[i]    = std::make_tuple(std::get<0>(x), std::get<1>(x), std::get<2>(x), true);
+  }
+  const SimplexId STSize = STPairs.size();
+  for (SimplexId i = 0; i < STSize; ++i) {
+     const auto& x       = STPairs[i];
+     CTPairs[JTSize + i] = std::make_tuple(std::get<0>(x), std::get<1>(x), std::get<2>(x), false);
+  }
+
+  {
+     auto cmp = [](const std::tuple<SimplexId, SimplexId, scalarType, bool>& a,
+                   const std::tuple<SimplexId, SimplexId, scalarType, bool>& b) {
+        return std::get<2>(a) < std::get<2>(b);
+     };
+
+     std::sort(CTPairs.begin(), CTPairs.end(), cmp);
+     // remove the last pair which is present two times (global extrema pair)
+     CTPairs.erase(CTPairs.end() - 1);
+  }
+
+  // Sort the STPairs so that the persistence thresholding is easy.
+  {
+     auto cmp = [](const std::tuple<SimplexId, SimplexId, scalarType>& a,
+                   const std::tuple<SimplexId, SimplexId, scalarType>& b) {
+        return std::get<2>(a) < std::get<2>(b);
+     };
+
+     std::sort(STPairs.begin(), STPairs.end(), cmp);
+  }
+
+  for (SimplexId i = 0; i < int(STPairs.size()); i++){
+    SimplexId a = std::get<0>(STPairs[i]);
+    SimplexId b = std::get<1>(STPairs[i]);
+    scalarType persistence = std::get<2>(STPairs[i]);
+    std::cerr << "a=" << a << "; b=" << b << "; p=" << persistence << ";\n";
+  }
+
+  // ----------------------------------------
+  // Algorithm for persistence thresholding
+  int clusterNumber;
+  scalarType persistenceThresh;
+  {
+    int points_to_check = 2;
+    int absthresh = 0.04 * std::get<2>(STPairs[STPairs.size()-1]);
+    int relthresh = 0.09;
+    int testing = 0;
+    int against = 1;
+    int m;
+
+    while(against < int(STPairs.size())) {
+      m = absthresh + std::get<2>(STPairs[testing]) * relthresh;
+      if(std::get<2>(STPairs[against]) < m * (against - testing) + std::get<2>(STPairs[testing])){
+        ++testing;
+        against = testing;
+      }
+      if(against - testing == points_to_check)
+        break;
+      ++against;
+    }
+
+    clusterNumber = STPairs.size() - testing - 1;
+    persistenceThresh = std::get<2>(STPairs[testing]) + m;
+
+    std::cerr << "Found " << clusterNumber << " clusters.\n";
+    std::cerr << "Thresholding at " << persistenceThresh << ".\n";
+  }
+  // ----------------------------------------
+  
+
+  for (SimplexId i = 0; i < int(CTPairs.size()); i++){
+    if(std::get<2>(CTPairs[i]) > persistenceThresh){
+      SimplexId a = std::get<0>(CTPairs[i]);
+      SimplexId b = std::get<1>(CTPairs[i]);
+      vertexIdentifiers.push_back(b);
+      vertexIdentifiers.push_back(a);
+    }
+  }
+
+  std::cout << "I can assign like this\n";
+
+  TopologicalSimplification topologicalSimplification;
+  topologicalSimplification.setupTriangulation(triangulation_);
+  // topologicalSimplification.setWrapper(this); // Don't need this
+  topologicalSimplification.setInputScalarFieldPointer(inputData);
+  topologicalSimplification.setVertexIdentifierScalarFieldPointer(&vertexIdentifiers[0]);
+  topologicalSimplification.setInputOffsetScalarFieldPointer(offsetData_);
+  topologicalSimplification.setOutputScalarFieldPointer(outputData);
+  topologicalSimplification.setOutputOffsetScalarFieldPointer(outputOffsetData_);
+  topologicalSimplification.setVertexNumber(vertexNumber);
+  topologicalSimplification.setConstraintNumber(vertexIdentifiers.size());
+  topologicalSimplification.setConsiderIdentifierAsBlackList(false);
+  topologicalSimplification.setAddPerturbation(false);
+
+  std::cout << "'Bout to execute...\n";
+  topologicalSimplification.execute<scalarType,idType>();
 
   std::cout << "It Worked!\n";
 

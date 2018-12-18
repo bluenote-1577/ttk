@@ -40,6 +40,16 @@ int ttkPersistenceSimplification::doIt(vector<vtkDataSet *> &inputs, vector<vtkD
   
   if(!inputScalarField)
     return -2;
+
+  // Set offsets
+  const SimplexId numberOfVertices=input->GetNumberOfPoints();
+
+  inputOffsets_=ttkSimplexIdTypeArray::New();
+  inputOffsets_->SetNumberOfComponents(1);
+  inputOffsets_->SetNumberOfTuples(numberOfVertices);
+  inputOffsets_->SetName(ttk::OffsetScalarFieldName);
+  for(SimplexId i=0; i<numberOfVertices; ++i)
+    inputOffsets_->SetTuple1(i,i);
   
   // allocate the memory for the output scalar field
   if(!outputScalarField_){
@@ -73,6 +83,29 @@ int ttkPersistenceSimplification::doIt(vector<vtkDataSet *> &inputs, vector<vtkD
   outputScalarField_->SetNumberOfTuples(input->GetNumberOfPoints());
   outputScalarField_->SetName(inputScalarField->GetName());
   
+
+  // get offsets
+  inputOffsets_=ttkSimplexIdTypeArray::New();
+  inputOffsets_->SetNumberOfComponents(1);
+  inputOffsets_->SetNumberOfTuples(numberOfVertices);
+  inputOffsets_->SetName(ttk::OffsetScalarFieldName);
+  for(SimplexId i=0; i<numberOfVertices; ++i)
+    inputOffsets_->SetTuple1(i,i);
+  vtkSmartPointer<ttkSimplexIdTypeArray> outputOffsets=vtkSmartPointer<ttkSimplexIdTypeArray>::New();
+  if(outputOffsets){
+    outputOffsets->SetNumberOfComponents(1);
+    outputOffsets->SetNumberOfTuples(numberOfVertices);
+    outputOffsets->SetName("Test1");
+  }
+  
+  // calling the executing package
+  persistenceSimplification_.setInputDataPointer(inputScalarField->GetVoidPointer(0));
+  persistenceSimplification_.setOutputDataPointer(outputScalarField_->GetVoidPointer(0));
+  persistenceSimplification_.setInputOffsetDataPointer(inputOffsets_->GetVoidPointer(0));
+  persistenceSimplification_.setOutputOffsetDataPointer(outputOffsets->GetVoidPointer(0));
+  switch(inputScalarField->GetDataType()){
+    ttkTemplateMacro(persistenceSimplification_.execute<VTK_TT TTK_COMMA int>(SomeIntegerArgument));
+  }
   
   // on the output, replace the field array by a pointer to its processed
   // version
@@ -83,13 +116,7 @@ int ttkPersistenceSimplification::doIt(vector<vtkDataSet *> &inputs, vector<vtkD
     output->GetPointData()->RemoveArray(0);
   }
   output->GetPointData()->AddArray(outputScalarField_);
-  
-  // calling the executing package
-  persistenceSimplification_.setInputDataPointer(inputScalarField->GetVoidPointer(0));
-  persistenceSimplification_.setOutputDataPointer(outputScalarField_->GetVoidPointer(0));
-  switch(inputScalarField->GetDataType()){
-    ttkTemplateMacro(persistenceSimplification_.execute<VTK_TT TTK_COMMA int>(SomeIntegerArgument));
-  }
+  output->GetPointData()->AddArray(outputOffsets);
   
   {
     stringstream msg;

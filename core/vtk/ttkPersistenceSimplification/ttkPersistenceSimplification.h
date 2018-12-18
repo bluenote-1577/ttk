@@ -145,7 +145,7 @@ class ttkPersistenceSimplification
       UseAllCores = true;
       ThreadNumber = 1;
       debugLevel_ = 3;
-      
+
       // TODO-1
       // Specify the number of input and output ports.
       // By default, this filter has one input and one output.
@@ -166,6 +166,6 @@ class ttkPersistenceSimplification
     double                SomeDoubleArgument;
     bool                  SomeOption;
     std::string           ScalarField;
-    vtkDataArray          *outputScalarField_;
+    vtkDataArray          *outputScalarField_, *inputOffsets_;
     ttk::PersistenceSimplification            persistenceSimplification_;
 };
