@@ -84,6 +84,8 @@ namespace ttk{
         bool autoBandwidth_;
         void* outputScalarFieldPointer_;
     private:
+        double diagonalLength;
+        double maxDist;
         double scaledBandwidth;
         bool donePreprocessing;
         SimplexId totalPointsGrid;
@@ -142,7 +144,7 @@ int ttk::PointDistField::preprocess(){
     double xDist = maxx-minx;
     double yDist = maxy-miny;
     double zDist = maxz-minz;
-    double maxDist;
+    maxDist;
 
     if(yDist > zDist){
         if (yDist > xDist){
@@ -182,6 +184,8 @@ int ttk::PointDistField::preprocess(){
     double origy = miny - offset_*yDist;
     double origz = minz - offset_*zDist;
     scaledBandwidth = bandwidth_ * sqrt(xDist*xDist + yDist*yDist + zDist*zDist);
+    diagonalLength = sqrt(xDist*xDist + yDist*yDist + zDist*zDist);
+    std::cout << "[pointDistField] diagonal length : " << diagonalLength << '\n';
 
     if(xPlanar){
         origx = 0;
@@ -236,8 +240,21 @@ int ttk::PointDistField::execute(){
     dataType* scalars=static_cast<dataType*>(outputScalarFieldPointer_);
     std::vector<dataType> kNeighbourDistances;
 
+    double mean_bandwidth = 0;
+    double stdeviation = 0;
     if(autoBandwidth_){
         kNeighbourDistances = closestNeighbours(inputPointCloud);
+        for (SimplexId i = 0; i < numberCloudPoints_ ; i++){
+            mean_bandwidth += kNeighbourDistances[i];
+            stdeviation += kNeighbourDistances[i] * kNeighbourDistances[i];
+        }
+
+        stdeviation /= numberCloudPoints_ - 1;
+        stdeviation = sqrt(stdeviation);
+
+        mean_bandwidth/= numberCloudPoints_;
+        std::cout << "[PointDistField] Automatic Bandwidth set as : " << mean_bandwidth << ".\n";
+        std::cout << "[PointDistField] Automatic+STDEV Bandwidth set as : " << mean_bandwidth + stdeviation/2<< ".\n";
     }
 
     #pragma omp parallel for num_threads(threadNumber_)
@@ -261,9 +278,10 @@ int ttk::PointDistField::execute(){
                 double bandwidth = scaledBandwidth;
                 if(autoBandwidth_){
                     //By lowering the exponent, we get a more spread out distribution. 
-                    //double exponent = 1.0;
-                    //bandwidth = pow(kNeighbourDistances[k],exponent) * pow(maxDist,1-exponent);
-                    bandwidth = kNeighbourDistances[k];
+                    double exponent = 1;
+//                    bandwidth = pow(kNeighbourDistances[k],exponent) * pow(maxDist,1-exponent);
+//                    bandwidth = kNeighbourDistances[k];
+                    bandwidth = mean_bandwidth;
                 }
 
                 if((distanceSquare)/(2 * bandwidth* bandwidth) < irrelevantExponent){
@@ -363,6 +381,17 @@ std::vector<dataType> ttk::PointDistField::closestNeighbours(std::vector<dataTyp
         neighbourdistance.push_back(nclosest_neighbours[num_neighbours]);
 
     }
+
+    double sum = 0;
+//    for(SimplexId i = 0; i < neighbourdistance.size(); i++){
+//        std::cout << neighbourdistance[i] << ",";
+//        sum += neighbourdistance[i];
+//    }
+
+    sum = sum/neighbourdistance.size();
+    std::cout << "Mean neighdist = " << sum << " in paraview use : " << sum / diagonalLength;
+
+
 
     /* The below section caps the bandwidth of points with points
      * with extremely close/far neighbours.
