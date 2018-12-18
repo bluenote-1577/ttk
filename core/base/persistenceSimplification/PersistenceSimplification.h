@@ -256,7 +256,7 @@ template <typename scalarType, typename idType> int ttk::PersistenceSimplificati
     int relthresh = 0.09;
     int testing = 0;
     int against = 1;
-    int m;
+    int m = 0;
 
     while(against < int(STPairs.size())) {
       m = absthresh + std::get<2>(STPairs[testing]) * relthresh;
@@ -272,8 +272,8 @@ template <typename scalarType, typename idType> int ttk::PersistenceSimplificati
     clusterNumber = STPairs.size() - testing - 1;
     persistenceThresh = std::get<2>(STPairs[testing]) + m;
 
-    std::cerr << "Found " << clusterNumber << " clusters.\n";
-    std::cerr << "Thresholding at " << persistenceThresh << ".\n";
+    std::cerr << "Found " << clusterNumber << " clusters\n";
+    std::cerr << "Thresholding at " << persistenceThresh << "\n";
   }
   // ----------------------------------------
   
@@ -286,8 +286,7 @@ template <typename scalarType, typename idType> int ttk::PersistenceSimplificati
       vertexIdentifiers.push_back(a);
     }
   }
-
-  std::cout << "I can assign like this\n";
+  std::cerr << "Using " << vertexIdentifiers.size() << " constraints\n";
 
   TopologicalSimplification topologicalSimplification;
   topologicalSimplification.setupTriangulation(triangulation_);
@@ -302,10 +301,7 @@ template <typename scalarType, typename idType> int ttk::PersistenceSimplificati
   topologicalSimplification.setConsiderIdentifierAsBlackList(false);
   topologicalSimplification.setAddPerturbation(false);
 
-  std::cout << "'Bout to execute...\n";
   topologicalSimplification.execute<scalarType,idType>();
-
-  std::cout << "It Worked!\n";
 
   {
     std::stringstream msg;
