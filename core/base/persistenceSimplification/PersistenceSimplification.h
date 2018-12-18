@@ -243,7 +243,7 @@ template <typename scalarType, typename idType> int ttk::PersistenceSimplificati
     SimplexId a = std::get<0>(STPairs[i]);
     SimplexId b = std::get<1>(STPairs[i]);
     scalarType persistence = std::get<2>(STPairs[i]);
-    std::cerr << "a=" << a << "; b=" << b << "; p=" << persistence << ";\n";
+    std::cerr << "[PersistenceSimplification] a=" << a << "; b=" << b << "; p=" << persistence << ";\n";
   }
 
   // ----------------------------------------
@@ -252,8 +252,8 @@ template <typename scalarType, typename idType> int ttk::PersistenceSimplificati
   scalarType persistenceThresh;
   {
     int points_to_check = 2;
-    int absthresh = 0.04 * std::get<2>(STPairs[STPairs.size()-1]);
-    int relthresh = 0.09;
+    int absthresh = 0.025 * std::get<2>(STPairs[STPairs.size()-1]);
+    int relthresh = 0.1;
     int testing = 0;
     int against = 1;
     int m = 0;
@@ -272,8 +272,8 @@ template <typename scalarType, typename idType> int ttk::PersistenceSimplificati
     clusterNumber = STPairs.size() - testing - 1;
     persistenceThresh = std::get<2>(STPairs[testing]) + m;
 
-    std::cerr << "Found " << clusterNumber << " clusters\n";
-    std::cerr << "Thresholding at " << persistenceThresh << "\n";
+    std::cerr << "[PersistenceSimplification] Found " << clusterNumber << " clusters\n";
+    std::cerr << "[PersistenceSimplification] Thresholding at " << persistenceThresh << "\n";
   }
   // ----------------------------------------
   
@@ -286,7 +286,8 @@ template <typename scalarType, typename idType> int ttk::PersistenceSimplificati
       vertexIdentifiers.push_back(a);
     }
   }
-  std::cerr << "Using " << vertexIdentifiers.size() << " constraints\n";
+  vertexIdentifiers.push_back(0);
+  std::cerr << "[PersistenceSimplification] Using " << vertexIdentifiers.size() << " constraints\n";
 
   TopologicalSimplification topologicalSimplification;
   topologicalSimplification.setupTriangulation(triangulation_);
