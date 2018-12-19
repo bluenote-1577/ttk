@@ -254,6 +254,7 @@ int ttk::PointDistField::execute(){
 
         mean_bandwidth/= numberCloudPoints_;
         std::cout << "[PointDistField] Automatic Bandwidth set as : " << mean_bandwidth << ".\n";
+        //mean_bandwidth += stdeviation/2;
         std::cout << "[PointDistField] Automatic+STDEV Bandwidth set as : " << mean_bandwidth + stdeviation/2<< ".\n";
     }
 

@@ -243,7 +243,7 @@ template <typename scalarType, typename idType> int ttk::PersistenceSimplificati
     SimplexId a = std::get<0>(STPairs[i]);
     SimplexId b = std::get<1>(STPairs[i]);
     scalarType persistence = std::get<2>(STPairs[i]);
-    std::cerr << "[PersistenceSimplification] a=" << a << "; b=" << b << "; p=" << persistence << ";\n";
+    std::cerr << "[PersistenceSimplification] a=" << a << ", b=" << b << ", p=" << persistence << ";\n";
   }
 
   // ----------------------------------------
@@ -252,21 +252,22 @@ template <typename scalarType, typename idType> int ttk::PersistenceSimplificati
   scalarType persistenceThresh;
   {
     int points_to_check = 2;
-    int absthresh = 0.025 * std::get<2>(STPairs[STPairs.size()-1]);
-    int relthresh = 0.1;
+    float absthresh = 0.025 * std::get<2>(STPairs[STPairs.size()-1]);
+    float relthresh = 0.1;
     int testing = 0;
     int against = 1;
     int m = 0;
 
     while(against < int(STPairs.size())) {
       m = absthresh + std::get<2>(STPairs[testing]) * relthresh;
-      if(std::get<2>(STPairs[against]) < m * (against - testing) + std::get<2>(STPairs[testing])){
-        ++testing;
+      if(std::get<2>(STPairs[against]) < (m * (against - testing) + std::get<2>(STPairs[testing]))){
+        testing+= 1;
         against = testing;
       }
-      if(against - testing == points_to_check)
+      if((against - testing) == points_to_check){
         break;
-      ++against;
+      }
+      against+= 1;
     }
 
     clusterNumber = STPairs.size() - testing - 1;
