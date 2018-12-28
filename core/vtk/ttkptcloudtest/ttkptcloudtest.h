@@ -95,9 +95,9 @@ class ttkptcloudtest
     bool                  Autobandwidth;
     int                   ThreadNumber;
     int                   NumberGridPoints;
-    double                Offset;
-    double                Bandwidth;
-    double                Mean;
+    double                 Offset;
+    double                 Bandwidth;
+    double                 Mean;
     ttkTriangulation      triangulation;
     ttk::PointDistField   pointDistField;
 

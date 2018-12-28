@@ -61,11 +61,11 @@ int ttkptcloudtest::doIt(vtkDataSet *input, vtkUnstructuredGrid *output){
     pointDistField.setNumberGridPoints(NumberGridPoints);
     pointDistField.setNumberCloudPoints(numpointsPointcloud);
     pointDistField.setInputPointCloud(static_cast<void*>(pointCloudCoordinates.data()));
-    pointDistField.preprocess<double>();
+    pointDistField.preprocess();
 
     vtkDoubleArray* outputScalarField = vtkDoubleArray::New();
     outputScalarField->vtkDoubleArray::SetNumberOfComponents(1);
-    outputScalarField->vtkDoubleArray::SetName("dist_field");
+    outputScalarField->vtkDoubleArray::SetName("PointCloudScalarField");
 
     if (pointDistField.isPlanar()){
         outputScalarField->vtkDoubleArray::SetNumberOfTuples(pow(NumberGridPoints,2));
@@ -75,7 +75,7 @@ int ttkptcloudtest::doIt(vtkDataSet *input, vtkUnstructuredGrid *output){
     }
 
     pointDistField.setOutputScalarFieldPointer(outputScalarField->GetVoidPointer(0));
-    pointDistField.execute<double>();
+    pointDistField.execute();
 
     vtkSmartPointer<vtkUnstructuredGrid> triangle_unstruct_grid =
         triangulation.getVtkUnstructuredGrid();
