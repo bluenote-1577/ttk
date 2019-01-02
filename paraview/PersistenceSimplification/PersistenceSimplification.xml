@@ -120,6 +120,16 @@
          number_of_elements="1"
          default_values="1">
         <BooleanDomain name="bool"/>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+            mode="visibility"
+            property="DistinctOption"
+            value="1" />
+          <PropertyWidgetDecorator type="GenericDecorator"
+            mode="visibility"
+            property="AutoOption"
+            value="0" />
+        </Hints>
          <Documentation>
           Some option for the persistenceSimplification filter.
          </Documentation>
@@ -132,6 +142,16 @@
          number_of_elements="1"
          default_values="1">
         <BooleanDomain name="bool"/>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+            mode="visibility"
+            property="DistinctOption"
+            value="1" />
+          <PropertyWidgetDecorator type="GenericDecorator"
+            mode="visibility"
+            property="AutoOption"
+            value="0" />
+        </Hints>
          <Documentation>
           Some option for the persistenceSimplification filter.
          </Documentation>
@@ -144,6 +164,16 @@
          number_of_elements="1"
          default_values="1">
         <BooleanDomain name="bool"/>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+            mode="visibility"
+            property="DistinctOption"
+            value="0" />
+          <PropertyWidgetDecorator type="GenericDecorator"
+            mode="visibility"
+            property="AutoOption"
+            value="0" />
+        </Hints>
          <Documentation>
           Some option for the persistenceSimplification filter.
          </Documentation>
@@ -156,6 +186,20 @@
          number_of_elements="1"
          default_values="1" >
         <IntRangeDomain name="range" min="0" max="100" />
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+            mode="visibility"
+            property="DistinctOption"
+            value="1" />
+          <PropertyWidgetDecorator type="GenericDecorator"
+            mode="visibility"
+            property="CountMinOption"
+            value="1" />
+          <PropertyWidgetDecorator type="GenericDecorator"
+            mode="visibility"
+            property="AutoOption"
+            value="0" />
+        </Hints>
          <Documentation>
            Integer argument for the persistenceSimplification filter.
          </Documentation>
@@ -168,6 +212,20 @@
          number_of_elements="1"
          default_values="1" >
         <IntRangeDomain name="range" min="0" max="100" />
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+            mode="visibility"
+            property="DistinctOption"
+            value="1" />
+          <PropertyWidgetDecorator type="GenericDecorator"
+            mode="visibility"
+            property="CountMaxOption"
+            value="1" />
+          <PropertyWidgetDecorator type="GenericDecorator"
+            mode="visibility"
+            property="AutoOption"
+            value="0" />
+        </Hints>
          <Documentation>
            Integer argument for the persistenceSimplification filter.
          </Documentation>
@@ -180,6 +238,20 @@
          number_of_elements="1"
          default_values="1" >
         <IntRangeDomain name="range" min="0" max="100" />
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+            mode="visibility"
+            property="DistinctOption"
+            value="0" />
+          <PropertyWidgetDecorator type="GenericDecorator"
+            mode="visibility"
+            property="CountAllOption"
+            value="1" />
+          <PropertyWidgetDecorator type="GenericDecorator"
+            mode="visibility"
+            property="AutoOption"
+            value="0" />
+        </Hints>
          <Documentation>
            Integer argument for the persistenceSimplification filter.
          </Documentation>
@@ -192,6 +264,20 @@
          number_of_elements="1"
          default_values="1" >
         <DoubleRangeDomain name="range" min="0" max="100" />
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+            mode="visibility"
+            property="DistinctOption"
+            value="0" />
+          <PropertyWidgetDecorator type="GenericDecorator"
+            mode="visibility"
+            property="CountAllOption"
+            value="0" />
+          <PropertyWidgetDecorator type="GenericDecorator"
+            mode="visibility"
+            property="AutoOption"
+            value="0" />
+        </Hints>
          <Documentation>
           Double argument for the persistenceSimplification filter.
          </Documentation>
@@ -204,6 +290,20 @@
          number_of_elements="1"
          default_values="1" >
         <DoubleRangeDomain name="range" min="0" max="100" />
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+            mode="visibility"
+            property="DistinctOption"
+            value="1" />
+          <PropertyWidgetDecorator type="GenericDecorator"
+            mode="visibility"
+            property="CountMaxOption"
+            value="0" />
+          <PropertyWidgetDecorator type="GenericDecorator"
+            mode="visibility"
+            property="AutoOption"
+            value="0" />
+        </Hints>
          <Documentation>
           Double argument for the persistenceSimplification filter.
          </Documentation>
@@ -216,6 +316,20 @@
          number_of_elements="1"
          default_values="1" >
         <DoubleRangeDomain name="range" min="0" max="100" />
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+            mode="visibility"
+            property="DistinctOption"
+            value="1" />
+          <PropertyWidgetDecorator type="GenericDecorator"
+            mode="visibility"
+            property="CountMinOption"
+            value="0" />
+          <PropertyWidgetDecorator type="GenericDecorator"
+            mode="visibility"
+            property="AutoOption"
+            value="0" />
+        </Hints>
          <Documentation>
           Double argument for the persistenceSimplification filter.
          </Documentation>
