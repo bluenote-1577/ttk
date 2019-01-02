@@ -41,7 +41,7 @@ namespace ttk{
       /// \param argment Dummy integer argument.
       /// \return Returns 0 upon success, negative values otherwise.
       template <typename scalarType, typename idType>
-        int execute(const int &argument) const;
+        int execute();
     
       /// Pass a pointer to an input array representing a scalarfield.
       /// The expected format for the array is the following:
@@ -64,6 +64,68 @@ namespace ttk{
 
       inline int setOutputOffsetDataPointer(void *data){
         outputOffsetData_ = data;
+        return 0;
+      }
+
+      // TODO_RC
+
+      inline int setArgument(int arg){
+        todoArg = arg;
+        return 0;
+      }
+
+      inline int setAutoOption(bool arg){
+        AutoOption = arg;
+        return 0;
+      }
+
+      inline int setDistinctOption(bool arg){
+        DistinctOption = arg;
+        return 0;
+      }
+
+      inline int setCountMinOption(bool arg){
+        CountMinOption = arg;
+        return 0;
+      }
+
+      inline int setCountMaxOption(bool arg){
+        CountMaxOption = arg;
+        return 0;
+      }
+
+      inline int setCountAllOption(bool arg){
+        CountAllOption = arg;
+        return 0;
+      }
+
+      inline int setCountMinArg(int arg){
+        CountMinArg = arg;
+        return 0;
+      }
+
+      inline int setCountMaxArg(int arg){
+        CountMaxArg = arg;
+        return 0;
+      }
+
+      inline int setCountAllArg(int arg){
+        CountAllArg = arg;
+        return 0;
+      }
+
+      inline int setPersistenceMinArg(double arg){
+        PersistenceMinArg = arg;
+        return 0;
+      }
+
+      inline int setPersistenceMaxArg(double arg){
+        PersistenceMaxArg = arg;
+        return 0;
+      }
+
+      inline int setPersistenceAllArg(double arg){
+        PersistenceAllArg = arg;
         return 0;
       }
 
@@ -137,6 +199,11 @@ namespace ttk{
     
       void                  *inputData_, *outputData_, *offsetData_, *outputOffsetData_;
       Triangulation         *triangulation_;
+
+      // TODO_RC
+      int todoArg, CountAllArg, CountMinArg, CountMaxArg;
+      double PersistenceMaxArg, PersistenceMinArg, PersistenceAllArg;
+      bool DistinctOption, AutoOption, CountMinOption, CountMaxOption, CountAllOption;
   };
 }
 
@@ -144,8 +211,7 @@ namespace ttk{
 // #include                  <PersistenceSimplification.cpp>
 
 // template functions
-template <typename scalarType, typename idType> int ttk::PersistenceSimplification::execute(
-  const int &argument) const{
+template <typename scalarType, typename idType> int ttk::PersistenceSimplification::execute(){
 
   Timer t;
   
@@ -245,6 +311,7 @@ template <typename scalarType, typename idType> int ttk::PersistenceSimplificati
     scalarType persistence = std::get<2>(STPairs[i]);
     std::cerr << "[PersistenceSimplification] a=" << a << ", b=" << b << ", p=" << persistence << ";\n";
   }
+  std::cerr << todoArg << "\n";
 
   // ----------------------------------------
   // Algorithm for persistence thresholding

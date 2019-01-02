@@ -50,6 +50,8 @@
           Select the scalar field to process.
         </Documentation>
       </StringVectorProperty>
+
+      <!-- TODO_RC -->
       
       <IntVectorProperty
          name="IntegerArgument"
@@ -86,6 +88,138 @@
           Some option for the persistenceSimplification filter.
          </Documentation>
       </IntVectorProperty>
+
+      <IntVectorProperty
+         name="DistinctOption"
+         label="Distinct Threshold"
+         command="SetDistinctOption"
+         number_of_elements="1"
+         default_values="1">
+        <BooleanDomain name="bool"/>
+         <Documentation>
+          Some option for the persistenceSimplification filter.
+         </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty
+         name="AutoOption"
+         label="Automatic Threshold"
+         command="SetAutoOption"
+         number_of_elements="1"
+         default_values="1">
+        <BooleanDomain name="bool"/>
+         <Documentation>
+          Some option for the persistenceSimplification filter.
+         </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty
+         name="CountMinOption"
+         label="Threshold number of min pairs"
+         command="SetCountMinOption"
+         number_of_elements="1"
+         default_values="1">
+        <BooleanDomain name="bool"/>
+         <Documentation>
+          Some option for the persistenceSimplification filter.
+         </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty
+         name="CountMaxOption"
+         label="Threshold number of max pairs"
+         command="SetCountMaxOption"
+         number_of_elements="1"
+         default_values="1">
+        <BooleanDomain name="bool"/>
+         <Documentation>
+          Some option for the persistenceSimplification filter.
+         </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty
+         name="CountAllOption"
+         label="Threshold number of pairs"
+         command="SetCountAllOption"
+         number_of_elements="1"
+         default_values="1">
+        <BooleanDomain name="bool"/>
+         <Documentation>
+          Some option for the persistenceSimplification filter.
+         </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty
+         name="CountMinArg"
+         label="Min pairs threshold"
+         command="SetCountMinArg"
+         number_of_elements="1"
+         default_values="1" >
+        <IntRangeDomain name="range" min="0" max="100" />
+         <Documentation>
+           Integer argument for the persistenceSimplification filter.
+         </Documentation>
+      </IntVectorProperty>
+      
+      <IntVectorProperty
+         name="CountMaxArg"
+         label="Max pairs threshold"
+         command="SetCountMaxArg"
+         number_of_elements="1"
+         default_values="1" >
+        <IntRangeDomain name="range" min="0" max="100" />
+         <Documentation>
+           Integer argument for the persistenceSimplification filter.
+         </Documentation>
+      </IntVectorProperty>
+      
+      <IntVectorProperty
+         name="CountAllArg"
+         label="Threshold"
+         command="SetCountAllArg"
+         number_of_elements="1"
+         default_values="1" >
+        <IntRangeDomain name="range" min="0" max="100" />
+         <Documentation>
+           Integer argument for the persistenceSimplification filter.
+         </Documentation>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty
+         name="PersistenceAllArg"
+         label="Persistence threshold"
+         command="SetPersistenceAllArg"
+         number_of_elements="1"
+         default_values="1" >
+        <DoubleRangeDomain name="range" min="0" max="100" />
+         <Documentation>
+          Double argument for the persistenceSimplification filter.
+         </Documentation>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+         name="PersistenceMaxArg"
+         label="Max pairs persistence threshold"
+         command="SetPersistenceMaxArg"
+         number_of_elements="1"
+         default_values="1" >
+        <DoubleRangeDomain name="range" min="0" max="100" />
+         <Documentation>
+          Double argument for the persistenceSimplification filter.
+         </Documentation>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+         name="PersistenceMinArg"
+         label="Min pairs persistence threshold"
+         command="SetPersistenceMinArg"
+         number_of_elements="1"
+         default_values="1" >
+        <DoubleRangeDomain name="range" min="0" max="100" />
+         <Documentation>
+          Double argument for the persistenceSimplification filter.
+         </Documentation>
+      </DoubleVectorProperty>
       
       <IntVectorProperty
          name="UseAllCores"

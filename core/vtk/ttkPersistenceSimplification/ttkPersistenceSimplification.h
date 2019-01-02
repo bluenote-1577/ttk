@@ -72,6 +72,9 @@ class ttkPersistenceSimplification
     // the outside (in particular from paraview) - to adapt.
     // Note that the XML file for the ParaView plug-in specification needs to be
     // edited accordingly.
+
+    // TODO_RC
+
     vtkSetMacro(SomeIntegerArgument, int);
     vtkGetMacro(SomeIntegerArgument, int);
    
@@ -80,6 +83,40 @@ class ttkPersistenceSimplification
     
     vtkSetMacro(SomeOption, bool);
     vtkGetMacro(SomeOption, bool);
+    
+    vtkSetMacro(DistinctOption, bool);
+    vtkGetMacro(DistinctOption, bool);
+    
+    vtkSetMacro(AutoOption, bool);
+    vtkGetMacro(AutoOption, bool);
+    
+    vtkSetMacro(CountMinOption, bool);
+    vtkGetMacro(CountMinOption, bool);
+    
+    vtkSetMacro(CountMaxOption, bool);
+    vtkGetMacro(CountMaxOption, bool);
+    
+    vtkSetMacro(CountAllOption, bool);
+    vtkGetMacro(CountAllOption, bool);
+
+    vtkSetMacro(CountMinArg, int);
+    vtkGetMacro(CountMinArg, int);
+
+    vtkSetMacro(CountMaxArg, int);
+    vtkGetMacro(CountMaxArg, int);
+
+    vtkSetMacro(CountAllArg, int);
+    vtkGetMacro(CountAllArg, int);
+   
+    vtkSetMacro(PersistenceMaxArg, double);
+    vtkGetMacro(PersistenceMaxArg, double);
+   
+    vtkSetMacro(PersistenceMinArg, double);
+    vtkGetMacro(PersistenceMinArg, double);
+   
+    vtkSetMacro(PersistenceAllArg, double);
+    vtkGetMacro(PersistenceAllArg, double);
+
     
     vtkSetMacro(ScalarField, std::string);
     vtkGetMacro(ScalarField, std::string);
@@ -137,9 +174,21 @@ class ttkPersistenceSimplification
     ttkPersistenceSimplification(){
       
         // init
-      SomeIntegerArgument = 1;
+      // TODO_RC
+      SomeIntegerArgument = 143;
+      CountMinArg = 1;
+      CountMaxArg = 1;
+      CountAllArg = 1;
+      PersistenceAllArg = 1.0;
+      PersistenceMinArg = 1.0;
+      PersistenceMaxArg = 1.0;
       SomeDoubleArgument = 1;
       SomeOption = true;
+      DistinctOption = true;
+      CountMinOption = true;
+      CountMaxOption = true;
+      CountAllOption = true;
+      AutoOption = true;
       outputScalarField_ = NULL;
       
       UseAllCores = true;
@@ -161,10 +210,10 @@ class ttkPersistenceSimplification
     
     
   private:
-    
-    int                   SomeIntegerArgument;
-    double                SomeDoubleArgument;
-    bool                  SomeOption;
+    // TODO_RC
+    int                   SomeIntegerArgument, CountMinArg, CountMaxArg, CountAllArg;
+    double                SomeDoubleArgument, PersistenceMaxArg, PersistenceMinArg, PersistenceAllArg;
+    bool                  SomeOption, DistinctOption, AutoOption, CountMaxOption, CountMinOption, CountAllOption;
     std::string           ScalarField;
     vtkDataArray          *outputScalarField_, *inputOffsets_;
     ttk::PersistenceSimplification            persistenceSimplification_;

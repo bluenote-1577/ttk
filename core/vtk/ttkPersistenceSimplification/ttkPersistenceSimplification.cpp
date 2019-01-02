@@ -95,7 +95,7 @@ int ttkPersistenceSimplification::doIt(vector<vtkDataSet *> &inputs, vector<vtkD
   if(outputOffsets){
     outputOffsets->SetNumberOfComponents(1);
     outputOffsets->SetNumberOfTuples(numberOfVertices);
-    outputOffsets->SetName("Test1");
+    outputOffsets->SetName("OutputOffsetScalarField");
   }
   
   // calling the executing package
@@ -103,8 +103,24 @@ int ttkPersistenceSimplification::doIt(vector<vtkDataSet *> &inputs, vector<vtkD
   persistenceSimplification_.setOutputDataPointer(outputScalarField_->GetVoidPointer(0));
   persistenceSimplification_.setInputOffsetDataPointer(inputOffsets_->GetVoidPointer(0));
   persistenceSimplification_.setOutputOffsetDataPointer(outputOffsets->GetVoidPointer(0));
+
+  // TODO_RC
+
+  persistenceSimplification_.setArgument(SomeIntegerArgument);
+  persistenceSimplification_.setDistinctOption(DistinctOption);
+  persistenceSimplification_.setAutoOption(AutoOption);
+  persistenceSimplification_.setCountMinOption(CountMinOption);
+  persistenceSimplification_.setCountMaxOption(CountMaxOption);
+  persistenceSimplification_.setCountAllOption(CountAllOption);
+  persistenceSimplification_.setCountMinArg(CountMinArg);
+  persistenceSimplification_.setCountMaxArg(CountMaxArg);
+  persistenceSimplification_.setCountAllArg(CountAllArg);
+  persistenceSimplification_.setPersistenceMinArg(PersistenceMinArg);
+  persistenceSimplification_.setPersistenceMaxArg(PersistenceMaxArg);
+  persistenceSimplification_.setPersistenceAllArg(PersistenceAllArg);
+
   switch(inputScalarField->GetDataType()){
-    ttkTemplateMacro(persistenceSimplification_.execute<VTK_TT TTK_COMMA int>(SomeIntegerArgument));
+    ttkTemplateMacro(persistenceSimplification_.execute<VTK_TT TTK_COMMA int>());
   }
   
   // on the output, replace the field array by a pointer to its processed
