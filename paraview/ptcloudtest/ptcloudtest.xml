@@ -90,7 +90,7 @@
       </DoubleVectorProperty>
 
        <IntVectorProperty
-         name="GaussianKDE"
+         name="Gaussian KDE"
          label="Gaussian Kernel Density Estimation"
          command="SetGaussianKDE"
          number_of_elements="1"
@@ -109,6 +109,13 @@
          number_of_elements="1"
          default_values="0">
         <BooleanDomain name="bool"/>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+            mode="enabled_state"
+            property="Gaussian KDE"
+            value="1" />
+        </Hints>
+
          <Documentation>
            Try to guess a valid bandwidth for Gaussian KDE.
          </Documentation>
