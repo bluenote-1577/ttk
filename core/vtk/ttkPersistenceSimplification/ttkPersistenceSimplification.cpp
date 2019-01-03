@@ -106,7 +106,6 @@ int ttkPersistenceSimplification::doIt(vector<vtkDataSet *> &inputs, vector<vtkD
 
   // TODO_RC
 
-  persistenceSimplification_.setArgument(SomeIntegerArgument);
   persistenceSimplification_.setDistinctOption(DistinctOption);
   persistenceSimplification_.setAutoOption(AutoOption);
   persistenceSimplification_.setCountMinOption(CountMinOption);
@@ -118,6 +117,9 @@ int ttkPersistenceSimplification::doIt(vector<vtkDataSet *> &inputs, vector<vtkD
   persistenceSimplification_.setPersistenceMinArg(PersistenceMinArg);
   persistenceSimplification_.setPersistenceMaxArg(PersistenceMaxArg);
   persistenceSimplification_.setPersistenceAllArg(PersistenceAllArg);
+  persistenceSimplification_.setUseMinOption(UseMinOption);
+  persistenceSimplification_.setUseMaxOption(UseMaxOption);
+  
 
   switch(inputScalarField->GetDataType()){
     ttkTemplateMacro(persistenceSimplification_.execute<VTK_TT TTK_COMMA int>());

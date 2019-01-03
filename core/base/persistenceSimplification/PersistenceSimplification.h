@@ -42,6 +42,9 @@ namespace ttk{
       /// \return Returns 0 upon success, negative values otherwise.
       template <typename scalarType, typename idType>
         int execute();
+
+      template <typename scalarType>
+        scalarType automaticThreshold(std::vector<std::tuple<SimplexId, SimplexId, scalarType>> pairs);
     
       /// Pass a pointer to an input array representing a scalarfield.
       /// The expected format for the array is the following:
@@ -69,11 +72,6 @@ namespace ttk{
 
       // TODO_RC
 
-      inline int setArgument(int arg){
-        todoArg = arg;
-        return 0;
-      }
-
       inline int setAutoOption(bool arg){
         AutoOption = arg;
         return 0;
@@ -81,6 +79,16 @@ namespace ttk{
 
       inline int setDistinctOption(bool arg){
         DistinctOption = arg;
+        return 0;
+      }
+
+      inline int setUseMinOption(int arg){
+        UseMinOption = arg;
+        return 0;
+      }
+
+      inline int setUseMaxOption(bool arg){
+        UseMaxOption = arg;
         return 0;
       }
 
@@ -201,9 +209,10 @@ namespace ttk{
       Triangulation         *triangulation_;
 
       // TODO_RC
-      int todoArg, CountAllArg, CountMinArg, CountMaxArg;
+      int CountAllArg, CountMinArg, CountMaxArg;
       double PersistenceMaxArg, PersistenceMinArg, PersistenceAllArg;
       bool DistinctOption, AutoOption, CountMinOption, CountMaxOption, CountAllOption;
+      bool UseMinOption, UseMaxOption;
   };
 }
 
@@ -271,22 +280,22 @@ template <typename scalarType, typename idType> int ttk::PersistenceSimplificati
   contourTree.computePersistencePairs<scalarType>(STPairs, false);
 
   // merge pairs
-  std::vector<std::tuple<SimplexId, SimplexId, scalarType, bool>> CTPairs(JTPairs.size() +
+  std::vector<std::tuple<SimplexId, SimplexId, scalarType>> CTPairs(JTPairs.size() +
                                                                         STPairs.size());
   const SimplexId JTSize = JTPairs.size();
   for (SimplexId i = 0; i < JTSize; ++i) {
      const auto& x = JTPairs[i];
-     CTPairs[i]    = std::make_tuple(std::get<0>(x), std::get<1>(x), std::get<2>(x), true);
+     CTPairs[i]    = std::make_tuple(std::get<0>(x), std::get<1>(x), std::get<2>(x));
   }
   const SimplexId STSize = STPairs.size();
   for (SimplexId i = 0; i < STSize; ++i) {
      const auto& x       = STPairs[i];
-     CTPairs[JTSize + i] = std::make_tuple(std::get<0>(x), std::get<1>(x), std::get<2>(x), false);
+     CTPairs[JTSize + i] = std::make_tuple(std::get<0>(x), std::get<1>(x), std::get<2>(x));
   }
 
   {
-     auto cmp = [](const std::tuple<SimplexId, SimplexId, scalarType, bool>& a,
-                   const std::tuple<SimplexId, SimplexId, scalarType, bool>& b) {
+     auto cmp = [](const std::tuple<SimplexId, SimplexId, scalarType>& a,
+                   const std::tuple<SimplexId, SimplexId, scalarType>& b) {
         return std::get<2>(a) < std::get<2>(b);
      };
 
@@ -305,55 +314,155 @@ template <typename scalarType, typename idType> int ttk::PersistenceSimplificati
      std::sort(STPairs.begin(), STPairs.end(), cmp);
   }
 
-  for (SimplexId i = 0; i < int(STPairs.size()); i++){
-    SimplexId a = std::get<0>(STPairs[i]);
-    SimplexId b = std::get<1>(STPairs[i]);
-    scalarType persistence = std::get<2>(STPairs[i]);
-    std::cerr << "[PersistenceSimplification] a=" << a << ", b=" << b << ", p=" << persistence << ";\n";
+  // Sort the JTPairs so that the persistence thresholding is easy.
+  {
+     auto cmp = [](const std::tuple<SimplexId, SimplexId, scalarType>& a,
+                   const std::tuple<SimplexId, SimplexId, scalarType>& b) {
+        return std::get<2>(a) < std::get<2>(b);
+     };
+
+     std::sort(JTPairs.begin(), JTPairs.end(), cmp);
   }
-  std::cerr << todoArg << "\n";
+
+  // Sort the CTPairs so that the persistence thresholding is easy.
+  {
+     auto cmp = [](const std::tuple<SimplexId, SimplexId, scalarType>& a,
+                   const std::tuple<SimplexId, SimplexId, scalarType>& b) {
+        return std::get<2>(a) < std::get<2>(b);
+     };
+
+     std::sort(CTPairs.begin(), CTPairs.end(), cmp);
+  }
+
+  // for (SimplexId i = 0; i < int(STPairs.size()); i++){
+  //   SimplexId a = std::get<0>(STPairs[i]);
+  //   SimplexId b = std::get<1>(STPairs[i]);
+  //   scalarType persistence = std::get<2>(STPairs[i]);
+  //   std::cerr << "[PersistenceSimplification] a=" << a << ", b=" << b << ", p=" << persistence << ";\n";
+  // }
+  // std::cerr << todoArg << "\n";
 
   // ----------------------------------------
   // Algorithm for persistence thresholding
-  int clusterNumber;
-  scalarType persistenceThresh;
-  {
-    int points_to_check = 2;
-    float absthresh = 0.025 * std::get<2>(STPairs[STPairs.size()-1]);
-    float relthresh = 0.1;
-    int testing = 0;
-    int against = 1;
-    int m = 0;
+  // int clusterNumber;
+  // scalarType persistenceThresh;
+  // {
+  //   int points_to_check = 2;
+  //   float absthresh = 0.025 * std::get<2>(STPairs[STPairs.size()-1]);
+  //   float relthresh = 0.1;
+  //   int testing = 0;
+  //   int against = 1;
+  //   int m = 0;
 
-    while(against < int(STPairs.size())) {
-      m = absthresh + std::get<2>(STPairs[testing]) * relthresh;
-      if(std::get<2>(STPairs[against]) < (m * (against - testing) + std::get<2>(STPairs[testing]))){
-        testing+= 1;
-        against = testing;
-      }
-      if((against - testing) == points_to_check){
-        break;
-      }
-      against+= 1;
-    }
+  //   while(against < int(STPairs.size())) {
+  //     m = absthresh + std::get<2>(STPairs[testing]) * relthresh;
+  //     if(std::get<2>(STPairs[against]) < (m * (against - testing) + std::get<2>(STPairs[testing]))){
+  //       testing+= 1;
+  //       against = testing;
+  //     }
+  //     if((against - testing) == points_to_check){
+  //       break;
+  //     }
+  //     against+= 1;
+  //   }
 
-    clusterNumber = STPairs.size() - testing - 1;
-    persistenceThresh = std::get<2>(STPairs[testing]) + m;
+  //   clusterNumber = STPairs.size() - testing - 1;
+  //   persistenceThresh = std::get<2>(STPairs[testing]) + m;
 
-    std::cerr << "[PersistenceSimplification] Found " << clusterNumber << " clusters\n";
-    std::cerr << "[PersistenceSimplification] Thresholding at " << persistenceThresh << "\n";
-  }
+  //   std::cerr << "[PersistenceSimplification] Found " << clusterNumber << " clusters\n";
+  //   std::cerr << "[PersistenceSimplification] Thresholding at " << persistenceThresh << "\n";
+  // }
   // ----------------------------------------
   
+  if(DistinctOption){
+    scalarType persistence;
 
-  for (SimplexId i = 0; i < int(CTPairs.size()); i++){
-    if(std::get<2>(CTPairs[i]) > persistenceThresh){
-      SimplexId a = std::get<0>(CTPairs[i]);
-      SimplexId b = std::get<1>(CTPairs[i]);
-      vertexIdentifiers.push_back(b);
-      vertexIdentifiers.push_back(a);
+    // MIN PAIRS
+    if(UseMinOption){
+      if(!AutoOption)
+        persistence = PersistenceMinArg;
+      else{
+        std::cerr << "[PersistenceSimplification] Thresholding Min Pairs:\n";
+        persistence = automaticThreshold(JTPairs);
+      }
+      if(AutoOption || !CountMinOption){
+        for (SimplexId i = 0; i < int(JTPairs.size()); i++){
+          if(std::get<2>(JTPairs[i]) > persistence){
+            SimplexId a = std::get<0>(JTPairs[i]);
+            SimplexId b = std::get<1>(JTPairs[i]);
+            vertexIdentifiers.push_back(b);
+            vertexIdentifiers.push_back(a);
+          }
+        }
+      }
+      else{
+        for (SimplexId i = int(JTPairs.size()) - CountMinArg; i < int(JTPairs.size()); i++){
+          SimplexId a = std::get<0>(JTPairs[i]);
+          SimplexId b = std::get<1>(JTPairs[i]);
+          vertexIdentifiers.push_back(b);
+          vertexIdentifiers.push_back(a);
+        }
+      }
+    }
+
+    // MAX PAIRS
+    if(UseMaxOption){
+      if(!AutoOption)
+        persistence = PersistenceMaxArg;
+      else{
+        std::cerr << "[PersistenceSimplification] Thresholding Max Pairs:\n";
+        persistence = automaticThreshold(STPairs);
+      }
+      if(AutoOption || !CountMaxOption){
+        for (SimplexId i = 0; i < int(STPairs.size()); i++){
+          if(std::get<2>(STPairs[i]) > persistence){
+            SimplexId a = std::get<0>(STPairs[i]);
+            SimplexId b = std::get<1>(STPairs[i]);
+            vertexIdentifiers.push_back(b);
+            vertexIdentifiers.push_back(a);
+          }
+        }
+      }
+      else{
+        for (SimplexId i = int(STPairs.size()) - CountMaxArg; i < int(STPairs.size()); i++){
+          SimplexId a = std::get<0>(STPairs[i]);
+          SimplexId b = std::get<1>(STPairs[i]);
+          vertexIdentifiers.push_back(b);
+          vertexIdentifiers.push_back(a);
+        }
+      }
     }
   }
+
+  else{
+    scalarType persistence;
+
+    // COMBINED PAIRS
+    if(!AutoOption)
+      persistence = PersistenceAllArg;
+    else{
+      persistence = automaticThreshold(CTPairs);
+    }
+    if(AutoOption || !CountAllOption){
+      for (SimplexId i = 0; i < int(CTPairs.size()); i++){
+        if(std::get<2>(CTPairs[i]) > persistence){
+          SimplexId a = std::get<0>(CTPairs[i]);
+          SimplexId b = std::get<1>(CTPairs[i]);
+          vertexIdentifiers.push_back(b);
+          vertexIdentifiers.push_back(a);
+        }
+      }
+    }
+    else{
+      for (SimplexId i = int(CTPairs.size()) - CountAllArg; i < int(CTPairs.size()); i++){
+        SimplexId a = std::get<0>(CTPairs[i]);
+        SimplexId b = std::get<1>(CTPairs[i]);
+        vertexIdentifiers.push_back(b);
+        vertexIdentifiers.push_back(a);
+      }
+    }
+  }
+
   vertexIdentifiers.push_back(0);
   std::cerr << "[PersistenceSimplification] Using " << vertexIdentifiers.size() << " constraints\n";
 
@@ -383,4 +492,37 @@ template <typename scalarType, typename idType> int ttk::PersistenceSimplificati
   }
   
   return 0;
+}
+
+template <typename scalarType> 
+scalarType ttk::PersistenceSimplification::automaticThreshold(
+  std::vector<std::tuple<SimplexId, SimplexId, scalarType>> pairs){
+  int clusterNumber;
+  scalarType persistenceThresh;
+
+  int points_to_check = 2;
+  float absthresh = 0.025 * std::get<2>(pairs[pairs.size()-1]);
+  float relthresh = 0.1;
+  int testing = 0;
+  int against = 1;
+  int m = 0;
+
+  while(against < int(pairs.size())) {
+    m = absthresh + std::get<2>(pairs[testing]) * relthresh;
+    if(std::get<2>(pairs[against]) < (m * (against - testing) + std::get<2>(pairs[testing]))){
+      testing+= 1;
+      against = testing;
+    }
+    if((against - testing) == points_to_check){
+      break;
+    }
+    against+= 1;
+  }
+
+  clusterNumber = pairs.size() - testing - 1;
+  persistenceThresh = std::get<2>(pairs[testing]) + m;
+
+  std::cerr << "[PersistenceSimplification] Found " << clusterNumber << " pairs\n";
+  std::cerr << "[PersistenceSimplification] Thresholding at " << persistenceThresh << "\n";
+  return persistenceThresh;
 }

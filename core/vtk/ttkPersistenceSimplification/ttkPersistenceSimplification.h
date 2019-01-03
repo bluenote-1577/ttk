@@ -74,21 +74,18 @@ class ttkPersistenceSimplification
     // edited accordingly.
 
     // TODO_RC
-
-    vtkSetMacro(SomeIntegerArgument, int);
-    vtkGetMacro(SomeIntegerArgument, int);
-   
-    vtkSetMacro(SomeDoubleArgument, double);
-    vtkGetMacro(SomeDoubleArgument, double);
-    
-    vtkSetMacro(SomeOption, bool);
-    vtkGetMacro(SomeOption, bool);
     
     vtkSetMacro(DistinctOption, bool);
     vtkGetMacro(DistinctOption, bool);
     
     vtkSetMacro(AutoOption, bool);
     vtkGetMacro(AutoOption, bool);
+    
+    vtkSetMacro(UseMinOption, bool);
+    vtkGetMacro(UseMinOption, bool);
+    
+    vtkSetMacro(UseMaxOption, bool);
+    vtkGetMacro(UseMaxOption, bool);
     
     vtkSetMacro(CountMinOption, bool);
     vtkGetMacro(CountMinOption, bool);
@@ -175,15 +172,14 @@ class ttkPersistenceSimplification
       
         // init
       // TODO_RC
-      SomeIntegerArgument = 143;
-      CountMinArg = 1;
-      CountMaxArg = 1;
-      CountAllArg = 1;
-      PersistenceAllArg = 1.0;
-      PersistenceMinArg = 1.0;
-      PersistenceMaxArg = 1.0;
-      SomeDoubleArgument = 1;
-      SomeOption = true;
+      CountMinArg = 2;
+      CountMaxArg = 0;
+      CountAllArg = 0;
+      UseMaxOption = true;
+      UseMinOption = false;
+      PersistenceAllArg = 0.0;
+      PersistenceMinArg = 0.0;
+      PersistenceMaxArg = 0.0;
       DistinctOption = true;
       CountMinOption = true;
       CountMaxOption = true;
@@ -211,9 +207,10 @@ class ttkPersistenceSimplification
     
   private:
     // TODO_RC
-    int                   SomeIntegerArgument, CountMinArg, CountMaxArg, CountAllArg;
-    double                SomeDoubleArgument, PersistenceMaxArg, PersistenceMinArg, PersistenceAllArg;
-    bool                  SomeOption, DistinctOption, AutoOption, CountMaxOption, CountMinOption, CountAllOption;
+    int                   CountMinArg, CountMaxArg, CountAllArg;
+    double                PersistenceMaxArg, PersistenceMinArg, PersistenceAllArg;
+    bool                  DistinctOption, AutoOption, CountMaxOption, CountMinOption, CountAllOption;
+    bool                  UseMinOption, UseMaxOption;
     std::string           ScalarField;
     vtkDataArray          *outputScalarField_, *inputOffsets_;
     ttk::PersistenceSimplification            persistenceSimplification_;

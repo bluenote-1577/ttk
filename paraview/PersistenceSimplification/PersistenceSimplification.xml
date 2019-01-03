@@ -52,54 +52,6 @@
       </StringVectorProperty>
 
       <!-- TODO_RC -->
-      
-      <IntVectorProperty
-         name="IntegerArgument"
-         label="Output integer argument"
-         command="SetSomeIntegerArgument"
-         number_of_elements="1"
-         default_values="1" >
-        <IntRangeDomain name="range" min="0" max="100" />
-         <Documentation>
-           Integer argument for the persistenceSimplification filter.
-         </Documentation>
-      </IntVectorProperty>
-      
-      <DoubleVectorProperty
-         name="DoubleArgument"
-         label="Output double argument"
-         command="SetSomeDoubleArgument"
-         number_of_elements="1"
-         default_values="1" >
-        <DoubleRangeDomain name="range" min="0" max="100" />
-         <Documentation>
-          Double argument for the persistenceSimplification filter.
-         </Documentation>
-      </DoubleVectorProperty>
-     
-       <IntVectorProperty
-         name="Option"
-         label="Some option"
-         command="SetSomeOption"
-         number_of_elements="1"
-         default_values="1">
-        <BooleanDomain name="bool"/>
-         <Documentation>
-          Some option for the persistenceSimplification filter.
-         </Documentation>
-      </IntVectorProperty>
-
-      <IntVectorProperty
-         name="DistinctOption"
-         label="Distinct Threshold"
-         command="SetDistinctOption"
-         number_of_elements="1"
-         default_values="1">
-        <BooleanDomain name="bool"/>
-         <Documentation>
-          Some option for the persistenceSimplification filter.
-         </Documentation>
-      </IntVectorProperty>
 
       <IntVectorProperty
          name="AutoOption"
@@ -114,8 +66,56 @@
       </IntVectorProperty>
 
       <IntVectorProperty
+         name="DistinctOption"
+         label="Seperate Max/Min"
+         command="SetDistinctOption"
+         number_of_elements="1"
+         default_values="1">
+        <BooleanDomain name="bool"/>
+         <Documentation>
+          Some option for the persistenceSimplification filter.
+         </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty
+         name="UseMinOption"
+         label="Use Min Pairs"
+         command="SetUseMinOption"
+         number_of_elements="1"
+         default_values="1">
+        <BooleanDomain name="bool"/>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+            mode="visibility"
+            property="DistinctOption"
+            value="1" />
+        </Hints>
+         <Documentation>
+          Some option for the persistenceSimplification filter.
+         </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty
+         name="UseMaxOption"
+         label="Use Max Pairs"
+         command="SetUseMaxOption"
+         number_of_elements="1"
+         default_values="1">
+        <BooleanDomain name="bool"/>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+            mode="visibility"
+            property="DistinctOption"
+            value="1" />
+        </Hints>
+         <Documentation>
+          Some option for the persistenceSimplification filter.
+         </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty
          name="CountMinOption"
-         label="Threshold number of min pairs"
+         label="Threshold Min Pairs by Number"
          command="SetCountMinOption"
          number_of_elements="1"
          default_values="1">
@@ -129,6 +129,10 @@
             mode="visibility"
             property="AutoOption"
             value="0" />
+          <PropertyWidgetDecorator type="GenericDecorator"
+            mode="visibility"
+            property="UseMinOption"
+            value="1" />
         </Hints>
          <Documentation>
           Some option for the persistenceSimplification filter.
@@ -137,7 +141,7 @@
 
       <IntVectorProperty
          name="CountMaxOption"
-         label="Threshold number of max pairs"
+         label="Threshold Max Pairs by Number"
          command="SetCountMaxOption"
          number_of_elements="1"
          default_values="1">
@@ -151,6 +155,10 @@
             mode="visibility"
             property="AutoOption"
             value="0" />
+          <PropertyWidgetDecorator type="GenericDecorator"
+            mode="visibility"
+            property="UseMaxOption"
+            value="1" />
         </Hints>
          <Documentation>
           Some option for the persistenceSimplification filter.
@@ -159,7 +167,7 @@
 
       <IntVectorProperty
          name="CountAllOption"
-         label="Threshold number of pairs"
+         label="Threshold Pairs by Number"
          command="SetCountAllOption"
          number_of_elements="1"
          default_values="1">
@@ -181,7 +189,7 @@
 
       <IntVectorProperty
          name="CountMinArg"
-         label="Min pairs threshold"
+         label="Number of Min Pairs"
          command="SetCountMinArg"
          number_of_elements="1"
          default_values="1" >
@@ -199,6 +207,10 @@
             mode="visibility"
             property="AutoOption"
             value="0" />
+          <PropertyWidgetDecorator type="GenericDecorator"
+            mode="visibility"
+            property="UseMinOption"
+            value="1" />
         </Hints>
          <Documentation>
            Integer argument for the persistenceSimplification filter.
@@ -207,7 +219,7 @@
       
       <IntVectorProperty
          name="CountMaxArg"
-         label="Max pairs threshold"
+         label="Number of Max Pairs"
          command="SetCountMaxArg"
          number_of_elements="1"
          default_values="1" >
@@ -225,6 +237,10 @@
             mode="visibility"
             property="AutoOption"
             value="0" />
+          <PropertyWidgetDecorator type="GenericDecorator"
+            mode="visibility"
+            property="UseMaxOption"
+            value="1" />
         </Hints>
          <Documentation>
            Integer argument for the persistenceSimplification filter.
@@ -233,7 +249,7 @@
       
       <IntVectorProperty
          name="CountAllArg"
-         label="Threshold"
+         label="Number of Pairs"
          command="SetCountAllArg"
          number_of_elements="1"
          default_values="1" >
@@ -258,9 +274,9 @@
       </IntVectorProperty>
 
       <DoubleVectorProperty
-         name="PersistenceAllArg"
-         label="Persistence threshold"
-         command="SetPersistenceAllArg"
+         name="PersistenceMinArg"
+         label="Min Pairs Persistence Threshold"
+         command="SetPersistenceMinArg"
          number_of_elements="1"
          default_values="1" >
         <DoubleRangeDomain name="range" min="0" max="100" />
@@ -268,15 +284,19 @@
           <PropertyWidgetDecorator type="GenericDecorator"
             mode="visibility"
             property="DistinctOption"
-            value="0" />
+            value="1" />
           <PropertyWidgetDecorator type="GenericDecorator"
             mode="visibility"
-            property="CountAllOption"
+            property="CountMinOption"
             value="0" />
           <PropertyWidgetDecorator type="GenericDecorator"
             mode="visibility"
             property="AutoOption"
             value="0" />
+          <PropertyWidgetDecorator type="GenericDecorator"
+            mode="visibility"
+            property="UseMinOption"
+            value="1" />
         </Hints>
          <Documentation>
           Double argument for the persistenceSimplification filter.
@@ -285,7 +305,7 @@
 
       <DoubleVectorProperty
          name="PersistenceMaxArg"
-         label="Max pairs persistence threshold"
+         label="Max Pairs Persistence Threshold"
          command="SetPersistenceMaxArg"
          number_of_elements="1"
          default_values="1" >
@@ -303,6 +323,10 @@
             mode="visibility"
             property="AutoOption"
             value="0" />
+          <PropertyWidgetDecorator type="GenericDecorator"
+            mode="visibility"
+            property="UseMaxOption"
+            value="1" />
         </Hints>
          <Documentation>
           Double argument for the persistenceSimplification filter.
@@ -310,9 +334,9 @@
       </DoubleVectorProperty>
 
       <DoubleVectorProperty
-         name="PersistenceMinArg"
-         label="Min pairs persistence threshold"
-         command="SetPersistenceMinArg"
+         name="PersistenceAllArg"
+         label="Persistence Threshold"
+         command="SetPersistenceAllArg"
          number_of_elements="1"
          default_values="1" >
         <DoubleRangeDomain name="range" min="0" max="100" />
@@ -320,10 +344,10 @@
           <PropertyWidgetDecorator type="GenericDecorator"
             mode="visibility"
             property="DistinctOption"
-            value="1" />
+            value="0" />
           <PropertyWidgetDecorator type="GenericDecorator"
             mode="visibility"
-            property="CountMinOption"
+            property="CountAllOption"
             value="0" />
           <PropertyWidgetDecorator type="GenericDecorator"
             mode="visibility"
@@ -381,10 +405,20 @@
         <Property name="ScalarField" />
       </PropertyGroup>
      
-      <PropertyGroup panel_widget="Line" label="Output options">
-        <Property name="IntegerArgument" />
-        <Property name="DoubleArgument" />
-        <Property name="Option" />
+      <PropertyGroup panel_widget="Line" label="Threshold options">
+        <Property name="AutoOption" />
+        <Property name="DistinctOption" />
+        <Property name="UseMinOption" />
+        <Property name="UseMaxOption" />
+        <Property name="CountMinOption" />
+        <Property name="CountMaxOption" />
+        <Property name="CountAllOption" />
+        <Property name="CountMinArg" />
+        <Property name="CountMaxArg" />
+        <Property name="CountAllArg" />
+        <Property name="PersistenceMinArg" />
+        <Property name="PersistenceMaxArg" />
+        <Property name="PersistenceAllArg" />
       </PropertyGroup>
       
       <PropertyGroup panel_widget="Line" label="Testing">
