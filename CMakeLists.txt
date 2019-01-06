@@ -1,9 +1,11 @@
 cmake_minimum_required(VERSION 3.2)
-project(ttk VERSION 0.9.7 LANGUAGES CXX)
+project(ttk VERSION 0.9.8 LANGUAGES CXX)
 
 option(TTK_BUILD_VTK_WRAPPERS "Build the TTK VTK Wrappers" ON)
 option(TTK_BUILD_PARAVIEW_PLUGINS "Build the TTK ParaView Plugins" ON)
 option(TTK_BUILD_STANDALONE_APPS "Build the TTK Standalone Applications" OFF)
+
+include(functions.cmake)
 
 if (TTK_BUILD_STANDALONE_APPS)
 	set(TTK_BUILD_VTK_WRAPPERS ON)
