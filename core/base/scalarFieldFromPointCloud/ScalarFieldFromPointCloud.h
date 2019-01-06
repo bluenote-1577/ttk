@@ -1,5 +1,5 @@
-#ifndef _POINTDISTFIELD_H
-#define _POINTDISTFIELD_H
+#ifndef _SCALARFIELDFROMPOINTCLOUD_H
+#define _SCALARFIELDFROMPOINTCLOUD_H
 
 // base code includes
 #include<Wrapper.h>
@@ -10,11 +10,11 @@
 
 namespace ttk{
 
-  class PointDistField : public Debug{
+  class ScalarFieldFromPointCloud: public Debug{
 
     public:
-       PointDistField();
-      ~PointDistField();
+       ScalarFieldFromPointCloud();
+      ~ScalarFieldFromPointCloud();
 
        int execute();
 

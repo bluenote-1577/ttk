@@ -6,13 +6,13 @@
        that matches your filter and then model your xml on it -->
   <ProxyGroup name="filters">
    <SourceProxy 
-     name="ptcloudtest" 
-     class="ttkptcloudtest" 
-     label="TTK ptcloudtest">
+     name="ScalarFieldFromPointCloud" 
+     class="ttkScalarFieldFromPointCloud" 
+     label="TTK ScalarFieldFromPointCloud">
      <Documentation
-        long_help="TTK ptcloudtest plugin."
-        short_help="TTK ptcloudtest plugin.">
-          TTK ptcloudtest plugin documentation.
+        long_help="TTK ScalarFieldFromPointCloud plugin."
+        short_help="TTK ScalarFieldFromPointCloud plugin.">
+          TTK ScalarFieldFromPointCloud plugin documentation.
      </Documentation>
      <InputProperty
         name="Input"

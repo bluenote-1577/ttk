@@ -1,11 +1,11 @@
-#include                  <ttkptcloudtest.h>
+#include                  <ttkScalarFieldFromPointCloud.h>
 
 using namespace std;
 using namespace ttk;
 
-vtkStandardNewMacro(ttkptcloudtest)
+vtkStandardNewMacro(ttkScalarFieldFromPointCloud)
 
-ttkptcloudtest::ttkptcloudtest(){
+ttkScalarFieldFromPointCloud::ttkScalarFieldFromPointCloud(){
     NumberGridPoints = 100;
     Offset = 0.1;
     GaussianKDE = false;
@@ -13,22 +13,22 @@ ttkptcloudtest::ttkptcloudtest(){
     Autobandwidth = false;
 }
 
-ttkptcloudtest::~ttkptcloudtest(){
+ttkScalarFieldFromPointCloud::~ttkScalarFieldFromPointCloud(){
 }
 
 
 // transmit abort signals -- to copy paste in other wrappers
-bool ttkptcloudtest::needsToAbort(){
+bool ttkScalarFieldFromPointCloud::needsToAbort(){
   return GetAbortExecute();
 }
 
 
 // transmit progress status -- to copy paste in other wrappers
-int ttkptcloudtest::updateProgress(const float &progress){
+int ttkScalarFieldFromPointCloud::updateProgress(const float &progress){
 
   {
     stringstream msg;
-    msg << "[ttkptcloudtest] " << progress*100 
+    msg << "[ttkScalarFieldFromPointCloud] " << progress*100 
       << "% processed...." << endl;
     dMsg(cout, msg.str(), advancedInfoMsg);
   }
@@ -37,7 +37,7 @@ int ttkptcloudtest::updateProgress(const float &progress){
   return 0;
 }
 
-int ttkptcloudtest::doIt(vtkDataSet *input, vtkUnstructuredGrid *output){
+int ttkScalarFieldFromPointCloud::doIt(vtkDataSet *input, vtkUnstructuredGrid *output){
 
     int numpointsPointcloud = input->GetNumberOfPoints();
     std::vector<std::vector<double>> pointCloudCoordinates;
@@ -53,29 +53,29 @@ int ttkptcloudtest::doIt(vtkDataSet *input, vtkUnstructuredGrid *output){
     
     triangulation.setInputData(vtkImageData::New());
     triangulation.getTriangulation()->setWrapper(this);
-    pointDistField.setGaussianKDE(GaussianKDE);
-    pointDistField.setupTriangulation(triangulation.getTriangulation());
-    pointDistField.setOffset(Offset);
-    pointDistField.setAutoBandwidth(Autobandwidth);
-    pointDistField.setBandwidth(Bandwidth);
-    pointDistField.setNumberGridPoints(NumberGridPoints);
-    pointDistField.setNumberCloudPoints(numpointsPointcloud);
-    pointDistField.setInputPointCloud(static_cast<void*>(pointCloudCoordinates.data()));
-    pointDistField.preprocess();
+    scalarFieldFromPointCloud.setGaussianKDE(GaussianKDE);
+    scalarFieldFromPointCloud.setupTriangulation(triangulation.getTriangulation());
+    scalarFieldFromPointCloud.setOffset(Offset);
+    scalarFieldFromPointCloud.setAutoBandwidth(Autobandwidth);
+    scalarFieldFromPointCloud.setBandwidth(Bandwidth);
+    scalarFieldFromPointCloud.setNumberGridPoints(NumberGridPoints);
+    scalarFieldFromPointCloud.setNumberCloudPoints(numpointsPointcloud);
+    scalarFieldFromPointCloud.setInputPointCloud(static_cast<void*>(pointCloudCoordinates.data()));
+    scalarFieldFromPointCloud.preprocess();
 
     vtkDoubleArray* outputScalarField = vtkDoubleArray::New();
     outputScalarField->vtkDoubleArray::SetNumberOfComponents(1);
     outputScalarField->vtkDoubleArray::SetName("PointCloudScalarField");
 
-    if (pointDistField.isPlanar()){
+    if (scalarFieldFromPointCloud.isPlanar()){
         outputScalarField->vtkDoubleArray::SetNumberOfTuples(pow(NumberGridPoints,2));
     }
     else{
         outputScalarField->vtkDoubleArray::SetNumberOfTuples(pow(NumberGridPoints,3));
     }
 
-    pointDistField.setOutputScalarFieldPointer(outputScalarField->GetVoidPointer(0));
-    pointDistField.execute();
+    scalarFieldFromPointCloud.setOutputScalarFieldPointer(outputScalarField->GetVoidPointer(0));
+    scalarFieldFromPointCloud.execute();
 
     vtkSmartPointer<vtkUnstructuredGrid> triangle_unstruct_grid =
         triangulation.getVtkUnstructuredGrid();
@@ -86,7 +86,7 @@ int ttkptcloudtest::doIt(vtkDataSet *input, vtkUnstructuredGrid *output){
 }
 
 // to adapt if your wrapper does not inherit from vtkDataSetAlgorithm
-int ttkptcloudtest::RequestData(vtkInformation *request, 
+int ttkScalarFieldFromPointCloud::RequestData(vtkInformation *request, 
   vtkInformationVector **inputVector, vtkInformationVector *outputVector){
 
   Memory m;
@@ -103,7 +103,7 @@ int ttkptcloudtest::RequestData(vtkInformation *request,
   
   {
     stringstream msg;
-    msg << "[ttkptcloudtest] Memory usage: " << m.getElapsedUsage() 
+    msg << "[ttkScalarFieldFromPointCloud] Memory usage: " << m.getElapsedUsage() 
       << " MB." << endl;
     dMsg(cout, msg.str(), memoryMsg);
   }

@@ -1,5 +1,5 @@
-#ifndef _TTK_PTLCOUDTEST_H
-#define _TTK_PTCLOUDTEST_H
+#ifndef _TTK_SCALARFIELDFROMPOINTCLOUD_H
+#define _TTK_SCALARFIELDFROMPOINTCLOUD_H
 
 // VTK includes 
 #include                  <vtkAppendPolyData.h>  
@@ -22,24 +22,24 @@
 
 // ttk code includes
 #include                  <ttkWrapper.h>
-#include                  <PointDistField.h>
+#include                  <ScalarFieldFromPointCloud.h>
 #include                  <Triangulation.h>
 #include                  <cmath>
 #include                  <vector>
 
 #ifndef TTK_PLUGIN
-class VTKFILTERSCORE_EXPORT ttkptcloudtest
+class VTKFILTERSCORE_EXPORT ttkScalarFieldFromPointCloud
 #else
-class ttkptcloudtest
+class ttkScalarFieldFromPointCloud
 #endif 
   : public vtkDataSetAlgorithm, public ttk::Wrapper{
 
   public:
       
-    static ttkptcloudtest* New();
+    static ttkScalarFieldFromPointCloud* New();
    
     // macros
-    vtkTypeMacro(ttkptcloudtest, vtkDataSetAlgorithm);
+    vtkTypeMacro(ttkScalarFieldFromPointCloud, vtkDataSetAlgorithm);
 
     // default ttk setters
     vtkSetMacro(debugLevel_, int);
@@ -82,9 +82,9 @@ class ttkptcloudtest
     
   protected:
     
-    ttkptcloudtest();
+    ttkScalarFieldFromPointCloud();
     
-    ~ttkptcloudtest();
+    ~ttkScalarFieldFromPointCloud();
     
         
     
@@ -99,7 +99,7 @@ class ttkptcloudtest
     double                 Bandwidth;
     double                 Mean;
     ttkTriangulation      triangulation;
-    ttk::PointDistField   pointDistField;
+    ttk::ScalarFieldFromPointCloud   scalarFieldFromPointCloud;
 
     // base code features
     int doIt(vtkDataSet *input, vtkUnstructuredGrid *output);
@@ -113,4 +113,4 @@ class ttkptcloudtest
    
 };
 
-#endif // _TTK_PTCLOUDTEST_H
+#endif 

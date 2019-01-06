@@ -1,9 +1,9 @@
-#include<PointDistField.h>
+#include<ScalarFieldFromPointCloud.h>
 
 using namespace std;
 using namespace ttk;
 
-PointDistField::PointDistField(){
+ScalarFieldFromPointCloud::ScalarFieldFromPointCloud(){
     irrelevantExponent = 15;
     maxDistanceBound = 100000000;
     e = 2.718281828459;
@@ -11,10 +11,10 @@ PointDistField::PointDistField(){
     donePreprocessing = false;
 
 }
-PointDistField::~PointDistField(){
+ScalarFieldFromPointCloud::~ScalarFieldFromPointCloud(){
 }
 
-std::vector<double> ttk::PointDistField::closestNeighbours(std::vector<double>* input) const {
+std::vector<double> ttk::ScalarFieldFromPointCloud::closestNeighbours(std::vector<double>* input) const {
     std::vector<double> neighbourdistance;
 
 //    Jan Orava(2016) - Nearest Neighbour Estimation - choice for optimal k.
@@ -29,7 +29,7 @@ std::vector<double> ttk::PointDistField::closestNeighbours(std::vector<double>* 
 
     {
         std::stringstream msg;
-        msg << "[PointDistField] " << "Nearest neighbour k value = " << num_neighbours << std::endl;
+        msg << "[ScalarFieldFromPointCloud] " << "Nearest neighbour k value = " << num_neighbours << std::endl;
         dMsg(std::cout, msg.str(), infoMsg);
     }
 
@@ -86,7 +86,7 @@ std::vector<double> ttk::PointDistField::closestNeighbours(std::vector<double>* 
     {
       std::stringstream msg;
       msg << 
-        "[PointDistField] Automatic bandwidth guess completed processing in "
+        "[ScalarFieldFromPointCloud] Automatic bandwidth guess completed processing in "
         << autoBandwidth_t.getElapsedTime() << " s. " 
         << "(" << threadNumber_ << " thread(s)). " << std::endl;
       dMsg(std::cout, msg.str(), timeMsg);
@@ -94,7 +94,7 @@ std::vector<double> ttk::PointDistField::closestNeighbours(std::vector<double>* 
     return neighbourdistance;
 }
 
-int ttk::PointDistField::preprocess(){
+int ttk::ScalarFieldFromPointCloud::preprocess(){
     double minx =maxDistanceBound;
     double miny =maxDistanceBound;
     double minz =maxDistanceBound;
@@ -178,7 +178,7 @@ int ttk::PointDistField::preprocess(){
     scaledBandwidth = bandwidth_ * sqrt(xDist*xDist + yDist*yDist + zDist*zDist);
     diagonalLength = sqrt(xDist*xDist + yDist*yDist + zDist*zDist);
     //TODO Debug message, remove in final iteration. 
-    std::cout << "[PointDistField] diagonal length : " << diagonalLength << '\n';
+    std::cout << "[ScalarFieldFromPointCloud] diagonal length : " << diagonalLength << '\n';
 
     if(xPlanar){
         origx = 0;
@@ -221,11 +221,11 @@ int ttk::PointDistField::preprocess(){
 }
 
 
-int ttk::PointDistField::execute(){
+int ttk::ScalarFieldFromPointCloud::execute(){
 
     if(!donePreprocessing){
         std::stringstream msg;
-        msg << "[PointDistField] " << "Preprocesing not finished. Error! " << std::endl;
+        msg << "[ScalarFieldFromPointCloud] " << "Preprocesing not finished. Error! " << std::endl;
         dMsg(std::cout, msg.str(), fatalMsg);
 
         return -1;
@@ -253,7 +253,7 @@ int ttk::PointDistField::execute(){
 
         {
             std::stringstream msg;
-            msg << "[PointDistField] Automatic Bandwidth set as : " << mean_bandwidth/diagonalLength << ".\n";
+            msg << "[ScalarFieldFromPointCloud] Automatic Bandwidth set as : " << mean_bandwidth/diagonalLength << ".\n";
             dMsg(std::cout, msg.str(), fatalMsg);
         }
 
@@ -323,7 +323,7 @@ int ttk::PointDistField::execute(){
     {
       std::stringstream msg;
       msg << 
-        "[PointDistField] Scalar field computation completed processing in "
+        "[ScalarFieldFromPointCloud] Scalar field computation completed processing in "
         << scalarFieldTimer_t.getElapsedTime() << " s. "
         << "(" << threadNumber_ << " thread(s)). " << std::endl;
       dMsg(std::cout, msg.str(), timeMsg);
