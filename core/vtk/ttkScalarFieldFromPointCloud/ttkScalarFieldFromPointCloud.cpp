@@ -42,7 +42,6 @@ int ttkScalarFieldFromPointCloud::doIt(vtkDataSet *input, vtkUnstructuredGrid *o
     int numpointsPointcloud = input->GetNumberOfPoints();
     std::vector<std::vector<double>> pointCloudCoordinates;
 
-    //Detect the bounds for the grid. 
     for(int i = 0; i < numpointsPointcloud; i++){
         double x = input->GetPoint(i)[0];
         double y = input->GetPoint(i)[1];
@@ -77,11 +76,12 @@ int ttkScalarFieldFromPointCloud::doIt(vtkDataSet *input, vtkUnstructuredGrid *o
     scalarFieldFromPointCloud.setOutputScalarFieldPointer(outputScalarField->GetVoidPointer(0));
     scalarFieldFromPointCloud.execute();
 
-    vtkSmartPointer<vtkUnstructuredGrid> triangle_unstruct_grid =
+    //Get a triangulated unstructured grid. 
+    vtkSmartPointer<vtkUnstructuredGrid> triangleUnstructGrid =
         triangulation.getVtkUnstructuredGrid();
     
-    triangle_unstruct_grid->GetPointData()->AddArray(outputScalarField);
-    output->ShallowCopy(triangle_unstruct_grid);
+    triangleUnstructGrid->GetPointData()->AddArray(outputScalarField);
+    output->ShallowCopy(triangleUnstructGrid);
 
 }
 
@@ -91,12 +91,9 @@ int ttkScalarFieldFromPointCloud::RequestData(vtkInformation *request,
 
   Memory m;
   
-  // here the vtkDataSet type should be changed to whatever type you consider.
   vtkDataSet *input = vtkDataSet::GetData(inputVector[0]);
 
   vtkInformation *outInfo = outputVector->GetInformationObject(0);
-//  outInfo->Set(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_PIECES(), 1);
-//  vtkImageData *output = vtkImageData::SafeDownCast(outInfo->Get(vtkDataObject::DATA_OBJECT()));
   vtkUnstructuredGrid *output = vtkUnstructuredGrid::GetData(outputVector);
   
   doIt(input, output);

@@ -9,11 +9,13 @@ ScalarFieldFromPointCloud::ScalarFieldFromPointCloud(){
     e = 2.718281828459;
     pi = 3.1415926535897;
     donePreprocessing = false;
-
 }
+
 ScalarFieldFromPointCloud::~ScalarFieldFromPointCloud(){
 }
 
+
+//Find the k-th closest neighbour of every point in the point cloud. 
 std::vector<double> ttk::ScalarFieldFromPointCloud::closestNeighbours(std::vector<double>* input) const {
     std::vector<double> neighbourdistance;
 
@@ -47,7 +49,6 @@ std::vector<double> ttk::ScalarFieldFromPointCloud::closestNeighbours(std::vecto
         double y = input[i][1];
         double z = input[i][2];
         std::list<double> nclosest_neighbours;
-//        std::vector<double> nclosest_neighbours;
 
         for (SimplexId j = 0; j < numberCloudPoints_; j++){
             if(i != j){
@@ -58,16 +59,20 @@ std::vector<double> ttk::ScalarFieldFromPointCloud::closestNeighbours(std::vecto
                 double dist = (pow(x-x_check,2)+pow(y-y_check,2)+pow(z-z_check,2));
 
                 if(dist < 0.0000001){
-                    //Don't want to divide by zero. This came up while testing - Jim
+                    //Don't want to divide by zero. This came up while testing 
                     continue;
                 }
 
-                auto loc = std::lower_bound(nclosest_neighbours.begin(), nclosest_neighbours.end(),dist);
-                if(std::distance(nclosest_neighbours.begin(), loc) <= num_neighbours){
-                    nclosest_neighbours.insert(loc,dist);
-                    if(SimplexId(nclosest_neighbours.size()) > num_neighbours + 1){
-                        nclosest_neighbours.pop_back();
+                if(nclosest_neighbours.size() > 0){
+                    if (dist > nclosest_neighbours.back()){
+                        continue;
                     }
+                }
+
+                auto loc = std::lower_bound(nclosest_neighbours.begin(), nclosest_neighbours.end(),dist);
+                nclosest_neighbours.insert(loc,dist);
+                if(SimplexId(nclosest_neighbours.size()) > num_neighbours){
+                    nclosest_neighbours.pop_back();
                 }
             }
 
@@ -75,12 +80,9 @@ std::vector<double> ttk::ScalarFieldFromPointCloud::closestNeighbours(std::vecto
 
         #pragma omp critical
         {
-        auto it = nclosest_neighbours.begin();
-        std::advance(it, num_neighbours);
-        neighbourdistance.push_back(sqrt(*it));
+        auto it = nclosest_neighbours.back();
+        neighbourdistance.push_back(sqrt(it));
         }
-
-
     }
 
     {
@@ -94,6 +96,8 @@ std::vector<double> ttk::ScalarFieldFromPointCloud::closestNeighbours(std::vecto
     return neighbourdistance;
 }
 
+//Preprocesses the point cloud. Determines the size of the grid needed
+//and whether the data is planar. 
 int ttk::ScalarFieldFromPointCloud::preprocess(){
     double minx =maxDistanceBound;
     double miny =maxDistanceBound;
@@ -138,23 +142,6 @@ int ttk::ScalarFieldFromPointCloud::preprocess(){
     double yDist = maxy-miny;
     double zDist = maxz-minz;
 
-    if(yDist > zDist){
-        if (yDist > xDist){
-            maxDist = yDist;
-        }
-        else{
-            maxDist = xDist;
-        }
-    }
-    else{
-        if(zDist > xDist){
-            maxDist = zDist;
-        }
-        else{
-            maxDist = xDist;
-        }
-    }
-
     bool xPlanar = false;
     bool yPlanar = false;
     bool zPlanar = false;
@@ -177,8 +164,6 @@ int ttk::ScalarFieldFromPointCloud::preprocess(){
     double origz = minz - offset_*zDist;
     scaledBandwidth = bandwidth_ * sqrt(xDist*xDist + yDist*yDist + zDist*zDist);
     diagonalLength = sqrt(xDist*xDist + yDist*yDist + zDist*zDist);
-    //TODO Debug message, remove in final iteration. 
-    std::cout << "[ScalarFieldFromPointCloud] diagonal length : " << diagonalLength << '\n';
 
     if(xPlanar){
         origx = 0;
@@ -235,25 +220,20 @@ int ttk::ScalarFieldFromPointCloud::execute(){
     double* scalars=static_cast<double*>(outputScalarFieldPointer_);
     std::vector<double> kNeighbourDistances;
 
-    double mean_bandwidth = 0;
-    double stdeviation = 0;
+    double meanBandwidth = 0;
 
+    //Try and guess a bandwidth for KDE.
     if(autoBandwidth_){
         kNeighbourDistances = closestNeighbours(inputPointCloud);
         for (SimplexId i = 0; i < numberCloudPoints_ ; i++){
-            mean_bandwidth += kNeighbourDistances[i];
-            stdeviation += kNeighbourDistances[i] * kNeighbourDistances[i];
+            meanBandwidth += kNeighbourDistances[i];
         }
 
-        //TODO I tried using stdeviation for some calculations, should remove later.
-        stdeviation /= numberCloudPoints_ - 1;
-        stdeviation = sqrt(stdeviation);
-
-        mean_bandwidth/= numberCloudPoints_;
+        meanBandwidth/= numberCloudPoints_;
 
         {
             std::stringstream msg;
-            msg << "[ScalarFieldFromPointCloud] Automatic Bandwidth set as : " << mean_bandwidth/diagonalLength << ".\n";
+            msg << "[ScalarFieldFromPointCloud] Automatic bandwidth set as : " << meanBandwidth/diagonalLength << ".\n";
             dMsg(std::cout, msg.str(), fatalMsg);
         }
 
@@ -261,6 +241,7 @@ int ttk::ScalarFieldFromPointCloud::execute(){
 
     Timer scalarFieldTimer_t;
 
+    //Compute the distance field or the KDE.
     #pragma omp parallel for num_threads(threadNumber_)
     for(SimplexId i = 0; i < totalPointsGrid; i++){
 
@@ -281,22 +262,20 @@ int ttk::ScalarFieldFromPointCloud::execute(){
             if(gaussianKDE_){
                 double bandwidth = scaledBandwidth;
                 if(autoBandwidth_){
-                    //By lowering the exponent, we get a more spread out distribution. 
-                    //double exponent = 1;
-//                    bandwidth = pow(kNeighbourDistances[k],exponent) * pow(maxDist,1-exponent);
-//                    bandwidth = kNeighbourDistances[k];
-                    bandwidth = mean_bandwidth;
+                    bandwidth = meanBandwidth;
                 }
 
+                //This approximation was used as a quick way to speed up computation 
                 if((distanceSquare)/(2 * bandwidth* bandwidth) < irrelevantExponent){
 
                     double bandwidthSquared = bandwidth * bandwidth;
 
                     //2-D density. 
                     if(isPlanar_){
+                        //The value was multiplied by 100.0 because it gave a nicer range for the density function.
                         scalarValue += 100.0/ bandwidthSquared / (2*pi) * pow(e,-distanceSquare/(2 * bandwidthSquared));
                     }
-                    //3-D densties have a different multiplication factor.
+                    //3-D densties have a different multiplication factor. See wikipedia. 
                     else{
                         scalarValue += 100.0/ pow(bandwidth * 2 * pi,3.0/2.0) * pow(e,-distanceSquare/(2*bandwidthSquared));
                     }
@@ -304,8 +283,10 @@ int ttk::ScalarFieldFromPointCloud::execute(){
                 }
             }
 
-            if(nearestNeighbourDistSquare > distanceSquare){
-                nearestNeighbourDistSquare = distanceSquare;
+            else{
+                if(nearestNeighbourDistSquare > distanceSquare){
+                    nearestNeighbourDistSquare = distanceSquare;
+                }
             }
         }
 

@@ -1,3 +1,23 @@
+/// \ingroup vtk
+/// \class ttkScalarFieldFromPointCloud
+/// \author Jim Shaw <jimshawster@gmail.com>
+/// \date January 2019
+///
+/// \brief TTK VTK-filter that wraps the scalarFieldFromFromPointCloud package.
+///
+/// VTK wrapping code for the @ScalarFieldFromPointCloud package.
+/// 
+/// \param Input Point Cloud (vtkDataSet)
+/// \param Output Output scalar field and regular grid (vtkDataSet)
+///
+/// This filter can be used as any other VTK filter (for instance, by using the 
+/// sequence of calls SetInputData(), Update(), GetOutput()).
+///
+/// See the related ParaView example state files for usage examples within a 
+/// VTK pipeline.
+///
+
+
 #ifndef _TTK_SCALARFIELDFROMPOINTCLOUD_H
 #define _TTK_SCALARFIELDFROMPOINTCLOUD_H
 
