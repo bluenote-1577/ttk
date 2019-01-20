@@ -43,6 +43,10 @@ namespace ttk{
       template <typename scalarType, typename idType>
         int execute();
 
+
+      /// Determine automatic persistence threshold.
+      /// \param a sorted vector of persistence pairs.
+      /// \return Returns a persistence value that can be used to threshold the input vector.
       template <typename scalarType>
         scalarType automaticThreshold(std::vector<std::tuple<SimplexId, SimplexId, scalarType>> pairs);
     
@@ -70,7 +74,7 @@ namespace ttk{
         return 0;
       }
 
-      // TODO_RC
+      /// The following functions set the values for the thresholding parameters from paraview
 
       inline int setAutoOption(bool arg){
         AutoOption = arg;
@@ -190,14 +194,7 @@ namespace ttk{
         triangulation_ = triangulation;
        
         if(triangulation_){
-          
-          // TODO-1
-          // Pre-condition functions.
-          // Call all the required pre-condition functions here!
-          // for example:
           triangulation_->preprocessVertexNeighbors();
-          // end of TODO-1
-          
         }
         
         return 0;
@@ -208,7 +205,7 @@ namespace ttk{
       void                  *inputData_, *outputData_, *offsetData_, *outputOffsetData_;
       Triangulation         *triangulation_;
 
-      // TODO_RC
+      // Threshold options
       int CountAllArg, CountMinArg, CountMaxArg;
       double PersistenceMaxArg, PersistenceMinArg, PersistenceAllArg;
       bool DistinctOption, AutoOption, CountMinOption, CountMaxOption, CountAllOption;
@@ -236,8 +233,6 @@ template <typename scalarType, typename idType> int ttk::PersistenceSimplificati
 
   scalarType *outputData = (scalarType *) outputData_;
   scalarType *inputData = (scalarType *) inputData_;
-  // SimplexId *offsetData = (SimplexId *) offsetData_;
-  // SimplexId *outputOffsetData = (SimplexId *) outputOffsetData_;
   
   SimplexId vertexNumber = triangulation_->getNumberOfVertices();
 
@@ -252,9 +247,7 @@ template <typename scalarType, typename idType> int ttk::PersistenceSimplificati
 #pragma omp parallel for num_threads(threadNumber_) 
 #endif
   for(SimplexId i = 0; i < vertexNumber; i++){
-    // TODO-2
     // processing here!
-    // end of TODO-2
   }
 
   const SimplexId numberOfVertices=triangulation_->getNumberOfVertices();
@@ -293,6 +286,7 @@ template <typename scalarType, typename idType> int ttk::PersistenceSimplificati
      CTPairs[JTSize + i] = std::make_tuple(std::get<0>(x), std::get<1>(x), std::get<2>(x));
   }
 
+  // Sort the CTPairs so that the persistence thresholding is easy.
   {
      auto cmp = [](const std::tuple<SimplexId, SimplexId, scalarType>& a,
                    const std::tuple<SimplexId, SimplexId, scalarType>& b) {
@@ -323,58 +317,11 @@ template <typename scalarType, typename idType> int ttk::PersistenceSimplificati
 
      std::sort(JTPairs.begin(), JTPairs.end(), cmp);
   }
-
-  // Sort the CTPairs so that the persistence thresholding is easy.
-  {
-     auto cmp = [](const std::tuple<SimplexId, SimplexId, scalarType>& a,
-                   const std::tuple<SimplexId, SimplexId, scalarType>& b) {
-        return std::get<2>(a) < std::get<2>(b);
-     };
-
-     std::sort(CTPairs.begin(), CTPairs.end(), cmp);
-  }
-
-  // for (SimplexId i = 0; i < int(STPairs.size()); i++){
-  //   SimplexId a = std::get<0>(STPairs[i]);
-  //   SimplexId b = std::get<1>(STPairs[i]);
-  //   scalarType persistence = std::get<2>(STPairs[i]);
-  //   std::cerr << "[PersistenceSimplification] a=" << a << ", b=" << b << ", p=" << persistence << ";\n";
-  // }
-  // std::cerr << todoArg << "\n";
-
-  // ----------------------------------------
-  // Algorithm for persistence thresholding
-  // int clusterNumber;
-  // scalarType persistenceThresh;
-  // {
-  //   int points_to_check = 2;
-  //   float absthresh = 0.025 * std::get<2>(STPairs[STPairs.size()-1]);
-  //   float relthresh = 0.1;
-  //   int testing = 0;
-  //   int against = 1;
-  //   int m = 0;
-
-  //   while(against < int(STPairs.size())) {
-  //     m = absthresh + std::get<2>(STPairs[testing]) * relthresh;
-  //     if(std::get<2>(STPairs[against]) < (m * (against - testing) + std::get<2>(STPairs[testing]))){
-  //       testing+= 1;
-  //       against = testing;
-  //     }
-  //     if((against - testing) == points_to_check){
-  //       break;
-  //     }
-  //     against+= 1;
-  //   }
-
-  //   clusterNumber = STPairs.size() - testing - 1;
-  //   persistenceThresh = std::get<2>(STPairs[testing]) + m;
-
-  //   std::cerr << "[PersistenceSimplification] Found " << clusterNumber << " clusters\n";
-  //   std::cerr << "[PersistenceSimplification] Thresholding at " << persistenceThresh << "\n";
-  // }
-  // ----------------------------------------
   
+
   if(DistinctOption){
+    // Threshold based on max/min pairs separately
+
     scalarType persistence;
 
     // MIN PAIRS
@@ -396,6 +343,7 @@ template <typename scalarType, typename idType> int ttk::PersistenceSimplificati
         }
       }
       else{
+        // Number of expected min pairs has been specified by the user in CountMinArg
         for (SimplexId i = int(JTPairs.size()) - CountMinArg; i < int(JTPairs.size()); i++){
           SimplexId a = std::get<0>(JTPairs[i]);
           SimplexId b = std::get<1>(JTPairs[i]);
@@ -424,6 +372,7 @@ template <typename scalarType, typename idType> int ttk::PersistenceSimplificati
         }
       }
       else{
+        // Number of expected max pairs has been specified by the user in CountMaxArg
         for (SimplexId i = int(STPairs.size()) - CountMaxArg; i < int(STPairs.size()); i++){
           SimplexId a = std::get<0>(STPairs[i]);
           SimplexId b = std::get<1>(STPairs[i]);
@@ -454,6 +403,7 @@ template <typename scalarType, typename idType> int ttk::PersistenceSimplificati
       }
     }
     else{
+      // Number of expected pairs has been specified by the user in CountAllArg
       for (SimplexId i = int(CTPairs.size()) - CountAllArg; i < int(CTPairs.size()); i++){
         SimplexId a = std::get<0>(CTPairs[i]);
         SimplexId b = std::get<1>(CTPairs[i]);
@@ -463,12 +413,14 @@ template <typename scalarType, typename idType> int ttk::PersistenceSimplificati
     }
   }
 
+  // Through experimentation, it was found that 0 must be given to TopologicalSimplification as an
+  // identifier for anything to work
   vertexIdentifiers.push_back(0);
   std::cerr << "[PersistenceSimplification] Using " << vertexIdentifiers.size() << " constraints\n";
 
+  // Create and execute the TopologicalSimplificaiton
   TopologicalSimplification topologicalSimplification;
   topologicalSimplification.setupTriangulation(triangulation_);
-  // topologicalSimplification.setWrapper(this); // Don't need this
   topologicalSimplification.setInputScalarFieldPointer(inputData);
   topologicalSimplification.setVertexIdentifierScalarFieldPointer(&vertexIdentifiers[0]);
   topologicalSimplification.setInputOffsetScalarFieldPointer(offsetData_);
@@ -493,6 +445,7 @@ template <typename scalarType, typename idType> int ttk::PersistenceSimplificati
   
   return 0;
 }
+
 
 template <typename scalarType> 
 scalarType ttk::PersistenceSimplification::automaticThreshold(

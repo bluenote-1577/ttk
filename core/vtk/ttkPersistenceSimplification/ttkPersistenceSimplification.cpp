@@ -104,7 +104,7 @@ int ttkPersistenceSimplification::doIt(vector<vtkDataSet *> &inputs, vector<vtkD
   persistenceSimplification_.setInputOffsetDataPointer(inputOffsets_->GetVoidPointer(0));
   persistenceSimplification_.setOutputOffsetDataPointer(outputOffsets->GetVoidPointer(0));
 
-  // TODO_RC
+  // Pass Paraview Thresholding options to the base code
 
   persistenceSimplification_.setDistinctOption(DistinctOption);
   persistenceSimplification_.setAutoOption(AutoOption);
