@@ -51,8 +51,6 @@
         </Documentation>
       </StringVectorProperty>
 
-      <!-- TODO_RC -->
-
       <IntVectorProperty
          name="AutoOption"
          label="Automatic Threshold"
@@ -61,7 +59,7 @@
          default_values="1">
         <BooleanDomain name="bool"/>
          <Documentation>
-          Some option for the persistenceSimplification filter.
+          Use the automaticThreshold function in PersistenceSimplification.h.
          </Documentation>
       </IntVectorProperty>
 
@@ -73,7 +71,7 @@
          default_values="1">
         <BooleanDomain name="bool"/>
          <Documentation>
-          Some option for the persistenceSimplification filter.
+          Use max/min pairs for thresholding separately.
          </Documentation>
       </IntVectorProperty>
 
@@ -91,7 +89,7 @@
             value="1" />
         </Hints>
          <Documentation>
-          Some option for the persistenceSimplification filter.
+          When using max/min separately, use the min pairs.
          </Documentation>
       </IntVectorProperty>
 
@@ -109,7 +107,7 @@
             value="1" />
         </Hints>
          <Documentation>
-          Some option for the persistenceSimplification filter.
+          When using max/min separately, use the max pairs.
          </Documentation>
       </IntVectorProperty>
 
@@ -135,7 +133,7 @@
             value="1" />
         </Hints>
          <Documentation>
-          Some option for the persistenceSimplification filter.
+          Demand the number of expected min pairs from the user.
          </Documentation>
       </IntVectorProperty>
 
@@ -161,7 +159,7 @@
             value="1" />
         </Hints>
          <Documentation>
-          Some option for the persistenceSimplification filter.
+          Demand the number of expected max pairs from the user.
          </Documentation>
       </IntVectorProperty>
 
@@ -183,7 +181,7 @@
             value="0" />
         </Hints>
          <Documentation>
-          Some option for the persistenceSimplification filter.
+          Demand the number of expected persistence pairs from the user when using app pairs together.
          </Documentation>
       </IntVectorProperty>
 
@@ -213,7 +211,7 @@
             value="1" />
         </Hints>
          <Documentation>
-           Integer argument for the persistenceSimplification filter.
+           Number of expected min pairs.
          </Documentation>
       </IntVectorProperty>
       
@@ -243,7 +241,7 @@
             value="1" />
         </Hints>
          <Documentation>
-           Integer argument for the persistenceSimplification filter.
+           Number of expected max pairs.
          </Documentation>
       </IntVectorProperty>
       
@@ -269,7 +267,7 @@
             value="0" />
         </Hints>
          <Documentation>
-           Integer argument for the persistenceSimplification filter.
+           Number of expected pairs when using the max/min pairs together.
          </Documentation>
       </IntVectorProperty>
 
@@ -299,7 +297,7 @@
             value="1" />
         </Hints>
          <Documentation>
-          Double argument for the persistenceSimplification filter.
+          Minimum persistence value for min pairs.
          </Documentation>
       </DoubleVectorProperty>
 
@@ -329,7 +327,7 @@
             value="1" />
         </Hints>
          <Documentation>
-          Double argument for the persistenceSimplification filter.
+          Minimum persistence value for max pairs.
          </Documentation>
       </DoubleVectorProperty>
 
@@ -355,7 +353,7 @@
             value="0" />
         </Hints>
          <Documentation>
-          Double argument for the persistenceSimplification filter.
+          Minimum persistence value for combined max/min pairs.
          </Documentation>
       </DoubleVectorProperty>
       
