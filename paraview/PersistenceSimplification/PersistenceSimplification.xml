@@ -12,7 +12,7 @@
      <Documentation
         long_help="TTK persistenceSimplification plugin."
         short_help="TTK persistenceSimplification plugin.">
-          TTK persistenceSimplification plugin documentation.
+          TTK PersistenceSimplification plugin documentation.
      </Documentation>
      <InputProperty
         name="Input"
@@ -48,6 +48,48 @@
         </ArrayListDomain>
         <Documentation>
           Select the scalar field to process.
+        </Documentation>
+      </StringVectorProperty>
+      
+      <IntVectorProperty
+         name="ForceInputOffsetScalarField"
+         command="SetForceInputOffsetScalarField"
+         label="Force Input Offset Field"
+         number_of_elements="1"
+         panel_visibility="advanced"
+         default_values="0">
+        <BooleanDomain name="bool"/>
+         <Documentation>
+          Check this box to force the usage of a specific input scalar field
+          as vertex offset (used to disambiguate flat plateaus).
+         </Documentation>
+      </IntVectorProperty>
+ 
+       <StringVectorProperty
+        name="InputOffsetScalarFieldName"
+        command="SetInputOffsetScalarFieldName"
+        label="Input Offset Field"
+        default_values="OutputOffsetScalarField"
+        number_of_elements="1"
+        animateable="0"
+        panel_visibility="advanced"
+        >
+        <ArrayListDomain
+          name="array_list"
+					default_values="0"
+                    >
+          <RequiredProperties>
+            <Property name="Input" function="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+            mode="visibility"
+            property="ForceInputOffsetScalarField"
+            value="1" />
+        </Hints>
+        <Documentation>
+          Select the input offset field (to disambiguate flat plateaus).
         </Documentation>
       </StringVectorProperty>
 
@@ -357,6 +399,18 @@
          </Documentation>
       </DoubleVectorProperty>
       
+      <StringVectorProperty
+				name="OutputOffsetScalarFieldName"
+				command="SetOutputOffsetScalarFieldName"
+				label="Output Offset Scalar Field"
+				number_of_elements="1"
+                panel_visibility="advanced">
+        <Documentation>
+          Select the name of the output offset field.
+        </Documentation>
+      </StringVectorProperty>
+      
+      
       <IntVectorProperty
          name="UseAllCores"
          label="Use All Cores"
@@ -401,9 +455,11 @@
       
       <PropertyGroup panel_widget="Line" label="Input options">
         <Property name="ScalarField" />
+        <Property name="ForceInputOffsetScalarField"/>
+				<Property name="InputOffsetScalarFieldName"/>
       </PropertyGroup>
      
-      <PropertyGroup panel_widget="Line" label="Threshold options">
+      <PropertyGroup panel_widget="Line" label="Output options">
         <Property name="AutoOption" />
         <Property name="DistinctOption" />
         <Property name="UseMinOption" />
@@ -417,6 +473,7 @@
         <Property name="PersistenceMinArg" />
         <Property name="PersistenceMaxArg" />
         <Property name="PersistenceAllArg" />
+        <Property name="OutputOffsetScalarFieldName"/>
       </PropertyGroup>
       
       <PropertyGroup panel_widget="Line" label="Testing">
@@ -426,7 +483,7 @@
       </PropertyGroup>
       
       <Hints>
-        <ShowInMenu category="TTK - Misc" />
+        <ShowInMenu category="TTK - Scalar Data" />
       </Hints>
    </SourceProxy>
  </ProxyGroup>

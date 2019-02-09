@@ -1,9 +1,12 @@
 /// \ingroup vtk
 /// \class ttkPersistenceSimplification
-/// \author Your Name Here <Your Email Address Here>
-/// \date The Date Here.
+/// \author Ryan Cotsakis <ryancotsakis@gmail.com>
+/// \author Jim Shaw <jimshawster@gmail.com>
+/// \author Julien Tierny <julien.tierny@sorbonne-universite.fr>
+/// \date February 2019.
 ///
-/// \brief TTK VTK-filter that wraps the persistenceSimplification processing package.
+/// \brief TTK VTK-filter that wraps the PersistenceSimplification processing 
+/// package.
 ///
 /// VTK wrapping code for the @PersistenceSimplification package.
 /// 
@@ -16,6 +19,18 @@
 /// See the related ParaView example state files for usage examples within a 
 /// VTK pipeline.
 ///
+/// \b Related \b publication \n
+/// "Generalized Topological Simplification of Scalar Fields on Surfaces" \n
+/// Julien Tierny, Valerio Pascucci \n
+/// Proc. of IEEE VIS 2012.\n
+/// IEEE Transactions on Visualization and Computer Graphics, 2012.
+///
+/// \sa ttkTopologicalSimplification
+/// \sa ttkScalarFieldCriticalPoints
+/// \sa ttkIntegralLines
+/// \sa ttkFTMTree
+/// \sa ttkIdentifiers
+/// \sa ttk::TopologicalSimplification
 /// \sa ttk::PersistenceSimplification
 #pragma once
 
@@ -114,6 +129,15 @@ class ttkPersistenceSimplification
     vtkSetMacro(ScalarField, std::string);
     vtkGetMacro(ScalarField, std::string);
     
+    vtkSetMacro(ForceInputOffsetScalarField, int);
+    vtkGetMacro(ForceInputOffsetScalarField, int);
+    
+    vtkSetMacro(InputOffsetScalarFieldName, std::string);
+    vtkGetMacro(InputOffsetScalarFieldName, std::string);
+    
+    vtkSetMacro(OutputOffsetScalarFieldName, std::string);
+    vtkGetMacro(OutputOffsetScalarFieldName, std::string);
+    
   protected:
    
     ttkPersistenceSimplification(){
@@ -134,9 +158,11 @@ class ttkPersistenceSimplification
       outputScalarField_ = NULL;
       
       UseAllCores = true;
-      ThreadNumber = 1;
-      debugLevel_ = 3;
-
+      
+      triangulation_ = NULL;
+      OutputOffsetScalarFieldName = ttk::OffsetScalarFieldName;
+      ForceInputVertexScalarField = false;
+      InputOffsetScalarFieldName = ttk::OffsetScalarFieldName;
     }
     
     ~ttkPersistenceSimplification(){};
@@ -153,6 +179,13 @@ class ttkPersistenceSimplification
 
     // default variables
     std::string           ScalarField;
+    std::string           InputOffsetScalarFieldName;
+    std::string           OutputOffsetScalarFieldName;
+    std::string           ForceInputVertexScalarField;
+    bool                  ForceInputOffsetScalarField;
     vtkDataArray          *outputScalarField_, *inputOffsets_;
     ttk::PersistenceSimplification            persistenceSimplification_;
+    ttk::Triangulation    *triangulation_;
+    
+    bool                  hasUpdatedMesh_;
 };

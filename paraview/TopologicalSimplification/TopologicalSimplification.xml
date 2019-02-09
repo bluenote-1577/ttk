@@ -268,8 +268,6 @@ offset field for flat plateau disambiguation).
                 <Property name="InputVertexScalarFieldName" />
 				<Property name="ForceInputOffsetScalarField"/>
 				<Property name="InputOffsetScalarFieldName"/>
-                <Property name="ForceInputVertexScalarField" />
-                <Property name="InputVertexScalarFieldName" />
 				<Property name="ConsiderIdentifierAsBlackList"/>
       </PropertyGroup>
       
