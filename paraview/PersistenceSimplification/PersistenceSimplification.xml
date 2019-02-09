@@ -93,31 +93,120 @@
         </Documentation>
       </StringVectorProperty>
 
-      <IntVectorProperty
-         name="AutoOption"
-         label="Automatic Threshold"
-         command="SetAutoOption"
+      <DoubleVectorProperty
+         name="PersistenceAllArg"
+         label="Persistence Threshold"
+         command="SetPersistenceAllArg"
          number_of_elements="1"
-         default_values="1">
-        <BooleanDomain name="bool"/>
+         default_values="1" >
+        <DoubleRangeDomain name="range" min="0" max="100" />
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+            mode="visibility"
+            property="DistinctOption"
+            value="0" />
+          <PropertyWidgetDecorator type="GenericDecorator"
+            mode="visibility"
+            property="CountAllOption"
+            value="0" />
+          <PropertyWidgetDecorator type="GenericDecorator"
+            mode="visibility"
+            property="AutoOption"
+            value="0" />
+        </Hints>
          <Documentation>
-          Use the automaticThreshold function in PersistenceSimplification.h.
+          Minimum persistence value for combined max/min pairs.
          </Documentation>
-      </IntVectorProperty>
+      </DoubleVectorProperty>
+      
 
       <IntVectorProperty
          name="DistinctOption"
-         label="Seperate Max/Min"
+         label="Separate Max/Min"
          command="SetDistinctOption"
          number_of_elements="1"
-         default_values="1">
+         default_values="0">
         <BooleanDomain name="bool"/>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+            mode="visibility"
+            property="AutoOption"
+            value="0" />
+        </Hints>
          <Documentation>
           Use max/min pairs for thresholding separately.
          </Documentation>
       </IntVectorProperty>
 
-      <IntVectorProperty
+      <DoubleVectorProperty
+         name="PersistenceMinArg"
+         label="Min Pairs Persistence Threshold"
+         command="SetPersistenceMinArg"
+         number_of_elements="1"
+         default_values="1" >
+        <DoubleRangeDomain name="range" min="0" max="100" />
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+            mode="visibility"
+            property="DistinctOption"
+            value="1" />
+          <PropertyWidgetDecorator type="GenericDecorator"
+            mode="visibility"
+            property="CountMinOption"
+            value="0" />
+          <PropertyWidgetDecorator type="GenericDecorator"
+            mode="visibility"
+            property="AutoOption"
+            value="0" />
+          <PropertyWidgetDecorator type="GenericDecorator"
+            mode="visibility"
+            property="UseMinOption"
+            value="1" />
+          <PropertyWidgetDecorator type="GenericDecorator"
+            mode="visibility"
+            property="CountAllOption"
+            value="0" />
+        </Hints>
+         <Documentation>
+          Minimum persistence value for min pairs.
+         </Documentation>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+         name="PersistenceMaxArg"
+         label="Max Pairs Persistence Threshold"
+         command="SetPersistenceMaxArg"
+         number_of_elements="1"
+         default_values="1" >
+        <DoubleRangeDomain name="range" min="0" max="100" />
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+            mode="visibility"
+            property="DistinctOption"
+            value="1" />
+          <PropertyWidgetDecorator type="GenericDecorator"
+            mode="visibility"
+            property="CountMaxOption"
+            value="0" />
+          <PropertyWidgetDecorator type="GenericDecorator"
+            mode="visibility"
+            property="AutoOption"
+            value="0" />
+          <PropertyWidgetDecorator type="GenericDecorator"
+            mode="visibility"
+            property="UseMaxOption"
+            value="1" />
+          <PropertyWidgetDecorator type="GenericDecorator"
+            mode="visibility"
+            property="CountAllOption"
+            value="0" />
+        </Hints>
+         <Documentation>
+          Minimum persistence value for max pairs.
+         </Documentation>
+      </DoubleVectorProperty>
+      
+<!--      <IntVectorProperty
          name="UseMinOption"
          label="Use Min Pairs"
          command="SetUseMinOption"
@@ -158,7 +247,7 @@
          label="Threshold Min Pairs by Number"
          command="SetCountMinOption"
          number_of_elements="1"
-         default_values="1">
+         default_values="0">
         <BooleanDomain name="bool"/>
         <Hints>
           <PropertyWidgetDecorator type="GenericDecorator"
@@ -184,7 +273,7 @@
          label="Threshold Max Pairs by Number"
          command="SetCountMaxOption"
          number_of_elements="1"
-         default_values="1">
+         default_values="0">
         <BooleanDomain name="bool"/>
         <Hints>
           <PropertyWidgetDecorator type="GenericDecorator"
@@ -204,14 +293,39 @@
           Demand the number of expected max pairs from the user.
          </Documentation>
       </IntVectorProperty>
+ -->
+      
 
-      <IntVectorProperty
+        <IntVectorProperty
          name="CountAllOption"
          label="Threshold Pairs by Number"
          command="SetCountAllOption"
          number_of_elements="1"
-         default_values="1">
+         default_values="0">
         <BooleanDomain name="bool"/>
+        <Hints>
+          <!--<PropertyWidgetDecorator type="GenericDecorator"
+            mode="visibility"
+            property="DistinctOption"
+            value="0" />-->
+          <PropertyWidgetDecorator type="GenericDecorator"
+            mode="visibility"
+            property="AutoOption"
+            value="0" />
+        </Hints>
+         <Documentation>
+          Demand the number of expected persistence pairs from the user when 
+using app pairs together.
+         </Documentation>
+      </IntVectorProperty>
+      
+      <IntVectorProperty
+         name="CountAllArg"
+         label="Number of Pairs"
+         command="SetCountAllArg"
+         number_of_elements="1"
+         default_values="1" >
+        <IntRangeDomain name="range" min="0" max="100" />
         <Hints>
           <PropertyWidgetDecorator type="GenericDecorator"
             mode="visibility"
@@ -219,14 +333,18 @@
             value="0" />
           <PropertyWidgetDecorator type="GenericDecorator"
             mode="visibility"
+            property="CountAllOption"
+            value="1" />
+          <PropertyWidgetDecorator type="GenericDecorator"
+            mode="visibility"
             property="AutoOption"
             value="0" />
         </Hints>
          <Documentation>
-          Demand the number of expected persistence pairs from the user when using app pairs together.
+           Number of expected pairs when using the max/min pairs together.
          </Documentation>
       </IntVectorProperty>
-
+      
       <IntVectorProperty
          name="CountMinArg"
          label="Number of Min Pairs"
@@ -250,6 +368,10 @@
           <PropertyWidgetDecorator type="GenericDecorator"
             mode="visibility"
             property="UseMinOption"
+            value="1" />
+          <PropertyWidgetDecorator type="GenericDecorator"
+            mode="visibility"
+            property="CountAllOption"
             value="1" />
         </Hints>
          <Documentation>
@@ -281,6 +403,10 @@
             mode="visibility"
             property="UseMaxOption"
             value="1" />
+          <PropertyWidgetDecorator type="GenericDecorator"
+            mode="visibility"
+            property="CountAllOption"
+            value="1" />
         </Hints>
          <Documentation>
            Number of expected max pairs.
@@ -288,116 +414,17 @@
       </IntVectorProperty>
       
       <IntVectorProperty
-         name="CountAllArg"
-         label="Number of Pairs"
-         command="SetCountAllArg"
+         name="AutoOption"
+         label="Automatic Threshold"
+         command="SetAutoOption"
          number_of_elements="1"
-         default_values="1" >
-        <IntRangeDomain name="range" min="0" max="100" />
-        <Hints>
-          <PropertyWidgetDecorator type="GenericDecorator"
-            mode="visibility"
-            property="DistinctOption"
-            value="0" />
-          <PropertyWidgetDecorator type="GenericDecorator"
-            mode="visibility"
-            property="CountAllOption"
-            value="1" />
-          <PropertyWidgetDecorator type="GenericDecorator"
-            mode="visibility"
-            property="AutoOption"
-            value="0" />
-        </Hints>
+         default_values="0"
+         panel_visibility="advanced">
+        <BooleanDomain name="bool"/>
          <Documentation>
-           Number of expected pairs when using the max/min pairs together.
+          Use the automaticThreshold function in PersistenceSimplification.h.
          </Documentation>
       </IntVectorProperty>
-
-      <DoubleVectorProperty
-         name="PersistenceMinArg"
-         label="Min Pairs Persistence Threshold"
-         command="SetPersistenceMinArg"
-         number_of_elements="1"
-         default_values="1" >
-        <DoubleRangeDomain name="range" min="0" max="100" />
-        <Hints>
-          <PropertyWidgetDecorator type="GenericDecorator"
-            mode="visibility"
-            property="DistinctOption"
-            value="1" />
-          <PropertyWidgetDecorator type="GenericDecorator"
-            mode="visibility"
-            property="CountMinOption"
-            value="0" />
-          <PropertyWidgetDecorator type="GenericDecorator"
-            mode="visibility"
-            property="AutoOption"
-            value="0" />
-          <PropertyWidgetDecorator type="GenericDecorator"
-            mode="visibility"
-            property="UseMinOption"
-            value="1" />
-        </Hints>
-         <Documentation>
-          Minimum persistence value for min pairs.
-         </Documentation>
-      </DoubleVectorProperty>
-
-      <DoubleVectorProperty
-         name="PersistenceMaxArg"
-         label="Max Pairs Persistence Threshold"
-         command="SetPersistenceMaxArg"
-         number_of_elements="1"
-         default_values="1" >
-        <DoubleRangeDomain name="range" min="0" max="100" />
-        <Hints>
-          <PropertyWidgetDecorator type="GenericDecorator"
-            mode="visibility"
-            property="DistinctOption"
-            value="1" />
-          <PropertyWidgetDecorator type="GenericDecorator"
-            mode="visibility"
-            property="CountMaxOption"
-            value="0" />
-          <PropertyWidgetDecorator type="GenericDecorator"
-            mode="visibility"
-            property="AutoOption"
-            value="0" />
-          <PropertyWidgetDecorator type="GenericDecorator"
-            mode="visibility"
-            property="UseMaxOption"
-            value="1" />
-        </Hints>
-         <Documentation>
-          Minimum persistence value for max pairs.
-         </Documentation>
-      </DoubleVectorProperty>
-
-      <DoubleVectorProperty
-         name="PersistenceAllArg"
-         label="Persistence Threshold"
-         command="SetPersistenceAllArg"
-         number_of_elements="1"
-         default_values="1" >
-        <DoubleRangeDomain name="range" min="0" max="100" />
-        <Hints>
-          <PropertyWidgetDecorator type="GenericDecorator"
-            mode="visibility"
-            property="DistinctOption"
-            value="0" />
-          <PropertyWidgetDecorator type="GenericDecorator"
-            mode="visibility"
-            property="CountAllOption"
-            value="0" />
-          <PropertyWidgetDecorator type="GenericDecorator"
-            mode="visibility"
-            property="AutoOption"
-            value="0" />
-        </Hints>
-         <Documentation>
-          Minimum persistence value for combined max/min pairs.
-         </Documentation>
-      </DoubleVectorProperty>
       
       <StringVectorProperty
 				name="OutputOffsetScalarFieldName"

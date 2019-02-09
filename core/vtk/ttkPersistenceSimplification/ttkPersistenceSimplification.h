@@ -150,11 +150,11 @@ class ttkPersistenceSimplification
       PersistenceAllArg = 0.0;
       PersistenceMinArg = 0.0;
       PersistenceMaxArg = 0.0;
-      DistinctOption = true;
+      DistinctOption = false;
       CountMinOption = true;
       CountMaxOption = true;
       CountAllOption = true;
-      AutoOption = true;
+      AutoOption = false;
       outputScalarField_ = NULL;
       
       UseAllCores = true;
