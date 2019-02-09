@@ -36,8 +36,6 @@ endif()
 set(TTK_PV_XML     "" CACHE INTERNAL "")
 set(TTK_PV_SOURCES "" CACHE INTERNAL "")
 set(TTK_PV_LINKS   "" CACHE INTERNAL "")
-set(TTK_PV_DIRS    "" CACHE INTERNAL "")
-set(TTK_VTKWRAPPER_DIRS    "" CACHE INTERNAL "")
 
 # traverse sub-directories
 file(GLOB PARAVIEW_PLUGIN_DIRS *)
@@ -50,6 +48,8 @@ foreach(PARAVIEW_PLUGIN ${PARAVIEW_PLUGIN_DIRS})
 endforeach()
 
 if (NOT TTK_BUILD_STANDALONE_PARAVIEW_PLUGINS)
+
+   set_property(GLOBAL PROPERTY TTK_VTKWRAPPER_DIRS    "")
 	# Build the ParaView plugin, if we're building with ParaView
 	# and this wrapper library has a plugin
 	add_paraview_plugin(TopologyToolKit ${PROJECT_VERSION}
