@@ -46,7 +46,10 @@
 #include                  <vtkIntArray.h>
 #include                  <vtkObjectFactory.h>
 #include                  <vtkPointData.h>
+#include                  <vtkShortArray.h>
 #include                  <vtkSmartPointer.h>
+#include                  <vtkUnsignedCharArray.h>
+#include                  <vtkUnsignedShortArray.h>
 
 // ttk code includes
 #include                  <PersistenceSimplification.h>
@@ -160,12 +163,19 @@ class ttkPersistenceSimplification
       UseAllCores = true;
       
       triangulation_ = NULL;
+      outputOffsets_ = NULL;
+      tmpOffsets_ = NULL;
       OutputOffsetScalarFieldName = ttk::OffsetScalarFieldName;
       ForceInputVertexScalarField = false;
       InputOffsetScalarFieldName = ttk::OffsetScalarFieldName;
     }
     
-    ~ttkPersistenceSimplification(){};
+    ~ttkPersistenceSimplification(){
+      if(outputScalarField_)
+        outputScalarField_->Delete();
+      if(tmpOffsets_)
+        tmpOffsets_->Delete();
+    };
     
     TTK_SETUP();
     
@@ -183,9 +193,11 @@ class ttkPersistenceSimplification
     std::string           OutputOffsetScalarFieldName;
     std::string           ForceInputVertexScalarField;
     bool                  ForceInputOffsetScalarField;
-    vtkDataArray          *outputScalarField_, *inputOffsets_;
+    vtkDataArray          *outputScalarField_;
+    vtkDataArray          *inputOffsets_;
+    vtkDataArray          *tmpOffsets_;
+    vtkDataArray          *outputOffsets_;
     ttk::PersistenceSimplification            persistenceSimplification_;
     ttk::Triangulation    *triangulation_;
     
-    bool                  hasUpdatedMesh_;
 };
