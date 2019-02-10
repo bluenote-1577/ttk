@@ -51,7 +51,10 @@ int ttkTopologicalSimplification::getTriangulation(vtkDataSet* input){
   
 #ifndef TTK_ENABLE_KAMIKAZE
   if(!triangulation_){
-    cerr << "[ttkTopologicalSimplification] Error : input triangulation pointer is NULL." << endl;
+    stringstream msg;
+    msg << "[ttkTopologicalSimplification] Error: "
+      << "input triangulation pointer is NULL." << endl;
+    dMsg(cerr, msg.str(), fatalMsg);
     return -1;
   }
 #endif
@@ -64,7 +67,10 @@ int ttkTopologicalSimplification::getTriangulation(vtkDataSet* input){
   
 #ifndef TTK_ENABLE_KAMIKAZE
   if(triangulation_->isEmpty()){
-    cerr << "[ttkTopologicalSimplification] Error : ttkTriangulation allocation problem." << endl;
+    stringstream msg;
+    cerr << "[ttkTopologicalSimplification] Error: "
+      << "ttkTriangulation allocation problem." << endl;
+    dMsg(cerr, msg.str(), fatalMsg);
     return -1;
   }
 #endif
@@ -89,7 +95,10 @@ int ttkTopologicalSimplification::getScalars(vtkDataSet* input){
 
 #ifndef TTK_ENABLE_KAMIKAZE
   if(!pointData){
-    cerr << "[ttkTopologicalSimplification] Error : input has no point data." << endl;
+    stringstream msg;
+    msg << "[ttkTopologicalSimplification] Error: input has no point data." 
+      << endl;
+    dMsg(cerr, msg.str(), fatalMsg);
     return -1;
   }
 #endif
@@ -105,7 +114,10 @@ int ttkTopologicalSimplification::getScalars(vtkDataSet* input){
 
 #ifndef TTK_ENABLE_KAMIKAZE
   if(!inputScalars_){
-    cerr << "[ttkTopologicalSimplification] Error : input scalar field pointer is null." << endl;
+    stringstream msg;
+    msg << "[ttkTopologicalSimplification] Error: "
+      << "input scalar field pointer is null." << endl;
+    dMsg(cerr, msg.str(), fatalMsg);
     return -3;
   }
 #endif
@@ -121,7 +133,10 @@ int ttkTopologicalSimplification::getIdentifiers(vtkPointSet* input){
 
 #ifndef TTK_ENABLE_KAMIKAZE
   if(!identifiers_){
-    cerr << "[ttkTopologicalSimplification] Error : wrong vertex identifier scalar field." << endl;
+    stringstream msg;
+    msg << "[ttkTopologicalSimplification] Error: "
+      << "wrong vertex identifier scalar field." << endl;
+    dMsg(cerr, msg.str(), fatalMsg);
     return -1;
   }
 #endif
@@ -162,7 +177,10 @@ int ttkTopologicalSimplification::getOffsets(vtkDataSet* input){
 
 #ifndef TTK_ENABLE_KAMIKAZE
   if(!inputOffsets_){
-    cerr << "[ttkTopologicalSimplification] Error : wrong input offset scalar field." << endl;
+    stringstream msg;
+    msg << "[ttkTopologicalSimplification] Error: "
+      << "wrong input offset scalar field." << endl;
+    dMsg(cerr, msg.str(), fatalMsg);
     return -1;
   }
 #endif
@@ -184,7 +202,10 @@ int ttkTopologicalSimplification::doIt(vector<vtkDataSet *> &inputs,
   ret=getTriangulation(domain);
 #ifndef TTK_ENABLE_KAMIKAZE
   if(ret){
-    cerr << "[ttkTopologicalSimplification] Error : wrong triangulation." << endl;
+    stringstream msg;
+    msg << "[ttkTopologicalSimplification] Error: "
+      << "wrong triangulation." << endl;
+    dMsg(cerr, msg.str(), fatalMsg);
     return -1;
   }
 #endif
@@ -192,7 +213,9 @@ int ttkTopologicalSimplification::doIt(vector<vtkDataSet *> &inputs,
   ret=getScalars(domain);
 #ifndef TTK_ENABLE_KAMIKAZE
   if(ret){
-    cerr << "[ttkTopologicalSimplification] Error : wrong scalars." << endl;
+    stringstream msg;
+    msg << "[ttkTopologicalSimplification] Error: wrong scalars." << endl;
+    dMsg(cerr, msg.str(), fatalMsg); 
     return -2;
   }
 #endif
@@ -200,7 +223,9 @@ int ttkTopologicalSimplification::doIt(vector<vtkDataSet *> &inputs,
   ret=getIdentifiers(constraints);
 #ifndef TTK_ENABLE_KAMIKAZE
   if(ret){
-    cerr << "[ttkTopologicalSimplification] Error : wrong identifiers." << endl;
+    stringstream msg;
+    msg << "[ttkTopologicalSimplification] Error: wrong identifiers." << endl;
+    dMsg(cerr, msg.str(), fatalMsg);
     return -3;
   }
 #endif
@@ -208,13 +233,19 @@ int ttkTopologicalSimplification::doIt(vector<vtkDataSet *> &inputs,
   ret=getOffsets(domain);
 #ifndef TTK_ENABLE_KAMIKAZE
   if(ret){
-    cerr << "[ttkTopologicalSimplification] Error : wrong offsets." << endl;
+    stringstream msg;
+    msg << "[ttkTopologicalSimplification] Error: wrong offsets." << endl;
+    dMsg(cerr, msg.str(), fatalMsg);
     return -4;
   }
 #endif
 #ifndef TTK_ENABLE_KAMIKAZE
-  if(inputOffsets_->GetDataType()!=VTK_INT and inputOffsets_->GetDataType()!=VTK_ID_TYPE){
-    cerr << "[ttkTopologicalSimplification] Error : input offset field type not supported." << endl;
+  if(inputOffsets_->GetDataType()!=VTK_INT 
+    and inputOffsets_->GetDataType()!=VTK_ID_TYPE){
+    stringstream msg;
+    msg << "[ttkTopologicalSimplification] Error: "
+      << "input offset field type not supported." << endl;
+    dMsg(cerr, msg.str(), fatalMsg);
     return -1;
   }
 #endif
@@ -222,7 +253,10 @@ int ttkTopologicalSimplification::doIt(vector<vtkDataSet *> &inputs,
   const SimplexId numberOfVertices=domain->GetNumberOfPoints();
 #ifndef TTK_ENABLE_KAMIKAZE
   if(numberOfVertices<=0){
-    cerr << "[ttkTopologicalSimplification] Error : domain has no points." << endl;
+    stringstream msg;
+    msg << "[ttkTopologicalSimplification] Error: domain has no points." 
+      << endl;
+    dMsg(cerr, msg.str(), fatalMsg);
     return -5;
   }
 #endif
@@ -238,7 +272,10 @@ int ttkTopologicalSimplification::doIt(vector<vtkDataSet *> &inputs,
   }
 #ifndef TTK_ENABLE_KAMIKAZE
   else{
-    cerr << "[ttkTopologicalSimplification] Error : ttkSimplexIdTypeArray allocation problem." << endl;
+    stringstream msg;
+    msg << "[ttkTopologicalSimplification] Error: "
+      << "ttkSimplexIdTypeArray allocation problem." << endl;
+    dMsg(cerr, msg.str(), fatalMsg);
     return -7;
   }
 #endif
@@ -279,8 +316,13 @@ int ttkTopologicalSimplification::doIt(vector<vtkDataSet *> &inputs,
 
 #ifndef TTK_ENABLE_KAMIKAZE
     default:
-      cerr << "[ttkTopologicalSimplification] Error : Unsupported data type." << endl;
-      return -8;
+      {
+        stringstream msg;
+        msg << "[ttkTopologicalSimplification] Error: "
+          << "Unsupported data type." << endl;
+        dMsg(cerr, msg.str(), fatalMsg);
+        return -8;
+      }
 #endif
   }
   if(outputScalars){
@@ -289,7 +331,10 @@ int ttkTopologicalSimplification::doIt(vector<vtkDataSet *> &inputs,
   }
 #ifndef TTK_ENABLE_KAMIKAZE
   else{
-    cerr << "[ttkTopologicalSimplification] Error : vtkDataArray allocation problem." << endl;
+    stringstream msg;
+    msg << "[ttkTopologicalSimplification] Error: "
+      << "vtkDataArray allocation problem." << endl;
+    dMsg(cerr, msg.str(), fatalMsg);
     return -9;
   }
 #endif
@@ -297,7 +342,10 @@ int ttkTopologicalSimplification::doIt(vector<vtkDataSet *> &inputs,
   const SimplexId numberOfConstraints=constraints->GetNumberOfPoints();
 #ifndef TTK_ENABLE_KAMIKAZE
   if(numberOfConstraints<=0){
-    cerr << "[ttkTopologicalSimplification] Error : input has no constraints." << endl;
+    stringstream msg;
+    msg << "[ttkTopologicalSimplification] Error: input has no constraints." 
+      << endl;
+    dMsg(cerr, msg.str(), fatalMsg);
     return -10;
   }
 #endif
@@ -323,7 +371,10 @@ int ttkTopologicalSimplification::doIt(vector<vtkDataSet *> &inputs,
 
 #ifndef TTK_ENABLE_KAMIKAZE
   if(identifiers_->GetDataType() != inputOffsets_->GetDataType()){
-    cerr << "[ttkTopologicalSimplification] Error : type of identifiers and offsets are different." << endl;
+    stringstream msg;
+    msg << "[ttkTopologicalSimplification] Error: "
+      << "type of identifiers and offsets are different." << endl;
+    dMsg(cerr, msg.str(), fatalMsg);
     return -11;
   }
 #endif
@@ -339,7 +390,10 @@ int ttkTopologicalSimplification::doIt(vector<vtkDataSet *> &inputs,
 #ifndef TTK_ENABLE_KAMIKAZE
   // something wrong in baseCode
   if(ret){
-    cerr << "[ttkTopologicalSimplification] TopologicalSimplification.execute() error code : " << ret << endl;
+    stringstream msg;
+    msg << "[ttkTopologicalSimplification] TopologicalSimplification.execute() "
+      << "error code : " << ret << endl;
+    dMsg(cerr, msg.str(), fatalMsg);
     return -12;
   }
 #endif
@@ -351,8 +405,8 @@ int ttkTopologicalSimplification::doIt(vector<vtkDataSet *> &inputs,
 
   {
     stringstream msg;
-    msg << "[ttkTopologicalSimplification] Memory usage: " << 
-m.getElapsedUsage()
+    msg << "[ttkTopologicalSimplification] Memory usage: " 
+      << m.getElapsedUsage()
       << " MB." << endl;
     dMsg(cout, msg.str(), memoryMsg);
   }
